@@ -5,9 +5,22 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.express as px
 
+
+def convert_date(date):
+    try:
+        # Format complet "%Y-%m-%d"
+        return pd.to_datetime(date, format="%Y-%m-%d")
+    except ValueError:
+        try:
+            # Format année seule "%Y", compléter par "-01-01"
+            return pd.to_datetime(date, format="%Y") + pd.offsets.DateOffset(months=0, days=0)
+        except ValueError:
+            return pd.NaT
+
+
 def get_dataframe(path):
     data = pd.read_csv(path)
-    data["track_album_release_date"] = pd.to_datetime(data["track_album_release_date"])
+    data["track_album_release_date"] = data["track_album_release_date"].apply(convert_date)
     data = data[data["track_album_release_date"].dt.year >= 1970] # On ne garde que les musiques après 1970, car il n'y a pas assez d'échantillons avant
     return data
 
