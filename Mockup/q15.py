@@ -92,7 +92,7 @@ app.layout = html.Div([
 
 @app.callback(
     Output('selected_genre', 'data'),
-    Input('graph', 'clickData')
+    [Input('graph', 'clickData')]
 )
 def update_selected_genre(clickData):
     if clickData is None:
@@ -101,7 +101,7 @@ def update_selected_genre(clickData):
 
 @app.callback(
     Output('subgenre_graph', 'figure'),
-    Input('selected_genre', 'data')
+    [Input('selected_genre', 'data')]
 )
 def display_area(selected_genre):
     if selected_genre is None:
@@ -181,7 +181,7 @@ def get_figure_popular_artists(selected_genre):
 
 @app.callback(
     Output('popular_artist_graph', 'figure'),
-    Input('selected_genre', 'data')
+    [Input('selected_genre', 'data')]
 )
 def display_popular_artists(selected_genre):
     return get_figure_popular_artists(selected_genre)
