@@ -6,9 +6,21 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
+def convert_date(date):
+    try:
+        # Format complet "%Y-%m-%d"
+        return pd.to_datetime(date, format="%Y-%m-%d")
+    except ValueError:
+        try:
+            # Format année seule "%Y", compléter par "-01-01"
+            return pd.to_datetime(date, format="%Y") + pd.offsets.DateOffset(months=0, days=0)
+        except ValueError:
+            return pd.NaT
+
+
 def get_dataframe(path):
     data = pd.read_csv(path)
-    data["track_album_release_date"] = pd.to_datetime(data["track_album_release_date"])
+    data["track_album_release_date"] = data["track_album_release_date"].apply(convert_date)
     data = data[data["track_album_release_date"].dt.year >= 1970] # On ne garde que les musiques après 1970, car il n'y a pas assez d'échantillons avant
     return data
 
@@ -24,8 +36,7 @@ def get_hover_template():
     )
 
 def get_figure():
-    data = pd.read_csv("./dataset/spotify_songs_clean.csv")
-
+    data = get_dataframe("./dataset/spotify_songs_clean.csv")
     div_pop_df = data.groupby("track_artist").agg(nb_subgenres=("playlist_subgenre", "nunique"), mean_popularity=("track_popularity", "mean")).reset_index()
     div_pop_df = div_pop_df.groupby("nb_subgenres").agg(mean_popularity=("mean_popularity", "mean"), nb_artist=("track_artist", "count")).reset_index()
     div_pop_df = div_pop_df[div_pop_df["nb_artist"] > 4]
