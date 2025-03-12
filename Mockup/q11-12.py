@@ -48,14 +48,14 @@ def get_figure():
         y=div_pop_df["mean_popularity"],
         name="Nombre d'artistes",
         mode='markers',
-        marker=dict(size=size, sizemode='area', sizeref=2, sizemin=4, color='#62d089'),
+        marker=dict(size=size, sizemode='area', sizeref=2, sizemin=4, color='#62d089', opacity=1),
         customdata=size,
     )])
 
     fig.update_traces(hovertemplate=get_hover_template())
 
     fig.update_layout(
-        title=dict(text="<b>Popularité moyenne des artistes en fonction du nombre de sous-genres<b>", font=dict(size=25)),
+        title=dict(text="<b>Popularité moyenne des artistes en fonction du nombre de sous-genres<b>", font=dict(size=20)),
         xaxis_title="Nombre de sous-genres", xaxis=dict(showgrid=True),
         yaxis_title="Popularité moyenne", yaxis=dict(showgrid=True),
         showlegend=True,
