@@ -12,22 +12,24 @@ from dash import dcc, html
 import plotly.express as px
 import pandas as pd
 
-# Convertir les dates en année uniquement
 df["year"] = pd.to_datetime(df["track_album_release_date"], errors='coerce').dt.year
+df = df[df["year"] > 1970]
+df["year"] = (df["year"] // 1) * 1
 
-# Filtrer les années avant 1970
-df = df[df["year"] >= 1970]
+# Filtrer
+df = df[df["track_popularity"] > 50]
 
-# Filtrer les musiques dont la popularité est supérieure à 70
-df = df[df["track_popularity"] > 70]
-
-# Filtrer les colonnes utiles
+# caract
 features = ["danceability", "energy", "speechiness", "acousticness", "instrumentalness", "liveness", "valence"]
 
 # Agréger par année et genre
 df_grouped = df.groupby(["year", "playlist_genre"])[features].mean().reset_index()
 
-# Créer l'application Dash
+
+# Appliquer une moyenne mobile sur 5 ans
+df_grouped[features] = df_grouped.groupby("playlist_genre")[features].transform(lambda x: x.rolling(window=5, min_periods=1).mean())
+
+
 app = dash.Dash(__name__)
 
 app.layout = html.Div([
@@ -41,7 +43,7 @@ app.layout = html.Div([
             title="Évolution des caractéristiques musicales moyennes par genre",
             labels={"year": "Année", "Value": "Valeur Moyenne", "playlist_genre": "Genre"},
             height=900
-        )
+        ).update_xaxes(tickvals=df_grouped["year"].unique())
     )
 ])
 

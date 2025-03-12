@@ -7,7 +7,7 @@ import plotly.express as px
 import webbrowser
 
 # remplacer avec path local
-dataset_path = "/Users/user/Desktop/poly-hiver2025/inf8808/project/DataVizH25/dataset/spotify_songs_clean.csv"
+dataset_path = "./dataset/spotify_songs_clean.csv"
 
 # carcteristiques audio
 carac_audio = [
@@ -107,5 +107,5 @@ def update_charts(selected_years):
 
 # ouvrir l'appli
 if __name__ == "__main__":
-    webbrowser.open_new("http://127.0.0.1:8050/")
+    webbrowser.open_new("http://127.0.0.1:8080/")
     app.run_server(debug=True)
