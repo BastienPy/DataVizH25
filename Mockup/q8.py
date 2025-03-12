@@ -43,6 +43,15 @@ def data_preprocess(path,type):
 
     return genre_data
 
+subgenre_cache = {
+    "edm": px.area(data_preprocess("./dataset/spotify_songs_clean.csv", "edm"), x="decennie", y="percentage", color="playlist_subgenre", line_group="playlist_subgenre", hover_data=["playlist_subgenre"]),
+    "latin": px.area(data_preprocess("./dataset/spotify_songs_clean.csv", "latin"), x="decennie", y="percentage", color="playlist_subgenre", line_group="playlist_subgenre", hover_data=["playlist_subgenre"]),
+    "pop":   px.area(data_preprocess("./dataset/spotify_songs_clean.csv", "pop"), x="decennie", y="percentage", color="playlist_subgenre", line_group="playlist_subgenre", hover_data=["playlist_subgenre"]),
+    "r&b":   px.area(data_preprocess("./dataset/spotify_songs_clean.csv", "r&b"), x="decennie", y="percentage", color="playlist_subgenre", line_group="playlist_subgenre", hover_data=["playlist_subgenre"]),
+    "rap":   px.area(data_preprocess("./dataset/spotify_songs_clean.csv", "rap"), x="decennie", y="percentage", color="playlist_subgenre", line_group="playlist_subgenre", hover_data=["playlist_subgenre"]),
+    "rock":  px.area(data_preprocess("./dataset/spotify_songs_clean.csv", "rock"), x="decennie", y="percentage", color="playlist_subgenre", line_group="playlist_subgenre", hover_data=["playlist_subgenre"])
+}
+
 
 def get_hover_template(type_name):
 
@@ -56,6 +65,8 @@ def get_hover_template(type_name):
         "<extra></extra>" # Pour enlever le "trace 0" qui apparait automatiquement sinon
     )
 
+
+
 def get_figure_genre():
     genre_data = data_preprocess("./dataset/spotify_songs_clean.csv", "playlist_genre")
     fig = px.area(genre_data, x="decennie", y="percentage", color="playlist_genre", line_group="playlist_genre", hover_data=["playlist_genre"])
@@ -64,6 +75,7 @@ def get_figure_genre():
     fig.update_traces(hovertemplate=get_hover_template("Genre"))
     fig.update_yaxes(title_text='Pourcentage (%)')
     fig.update_layout(legend_title_text="Genre")
+
 
     return fig
 
@@ -88,15 +100,14 @@ app.layout = html.Div([
 
 @app.callback(
     Output("subgenre_graph", "figure"),
-    [Input("pop-button", "pop_clicks"),
-     Input("rap-button", "rap_clicks"),
-     Input("rock-button", "rock_clicks"),
-     Input("edm-button", "edm_clicks"),
-     Input("r&b-button", "rnb_clicks"),
-     Input("latin-button", "latin_clicks")])
+    [Input("pop-button", "n_clicks"),
+     Input("rap-button", "n_clicks"),
+     Input("rock-button", "n_clicks"),
+     Input("edm-button", "n_clicks"),
+     Input("r&b-button", "n_clicks"),
+     Input("latin-button", "n_clicks")])
 def update_graph(pop_clicks, rap_clicks, rock_clicks, edm_clicks, rnb_clicks, latin_clicks):
     ctx = dash.callback_context
-    print(ctx.triggered)
     if not ctx.triggered:
         fig = px.area()
         fig.add_annotation(dict(xref="paper", yref="paper", x=0.5, y=0.5), text="Aucune donnée pour le moment, cliquez sur une des lignes.", showarrow=False)
@@ -104,39 +115,14 @@ def update_graph(pop_clicks, rap_clicks, rock_clicks, edm_clicks, rnb_clicks, la
     else:
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-    genre = None
     genre = button_id.split("-")[0]
-    print(genre)
-    genre_data = data_preprocess("./dataset/spotify_songs_clean.csv", genre)
-    fig = px.area(genre_data, x="decennie", y="percentage", color="playlist_subgenre", line_group="playlist_subgenre", hover_data=["playlist_subgenre"])
 
+    fig = subgenre_cache[genre]
 
     fig.update_traces(hovertemplate=get_hover_template(genre))
     fig.update_yaxes(title_text='Pourcentage (%)')
     fig.update_layout(legend_title_text="Sous genre de "+genre)
 
     return fig
-
-# @app.callback(
-#     Output('subgenre_graph', 'figure'),
-#     [Input('graph', 'clickData')])
-# def display_area(clickData):
-#     if clickData == None :
-#         fig = px.area()
-#         fig.add_annotation(dict(xref="paper", yref="paper", x=0.5, y=0.5), text="Aucune donnée pour le moment, cliquez sur une des lignes.", showarrow=False)
-
-#         return fig
-    
-#     type_name = clickData["points"][0]["customdata"][0]
-#     genre_data = data_preprocess("./dataset/spotify_songs_clean.csv", type_name)
-#     fig = px.area(genre_data, x="decennie", y="percentage", color="playlist_subgenre", line_group="playlist_subgenre", hover_data=["playlist_subgenre"])
-
-
-#     fig.update_traces(hovertemplate=get_hover_template(type_name))
-#     fig.update_yaxes(title_text='Pourcentage (%)')
-#     fig.update_layout(legend_title_text="Sous genre de "+type_name)
-
-#     return fig
-
 
 app.run_server(debug=False)
