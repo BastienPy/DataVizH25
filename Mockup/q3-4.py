@@ -12,15 +12,21 @@ def get_dataframe(path):
 
 def get_scatter_plot():
     data = get_dataframe("./dataset/spotify_songs_clean.csv")
+    
+    data["duration_bin"] = (data["duration_min"] * 4).round() / 4
+    
+    grouped_data = data.groupby("duration_bin", as_index=False).agg({"track_popularity": "mean"})
+    
     fig = px.scatter(
-        data, x="duration_min", y="track_popularity",
+        grouped_data, x="duration_bin", y="track_popularity",
         title="Relation entre la durée d'un morceau et sa popularité",
-        labels={"duration_min": "Durée (minutes)", "track_popularity": "Popularité"},
-        opacity=0.6,
-        hover_data=["track_name"]  
+        labels={"duration_bin": "Durée", "track_popularity": "Popularité moyenne"},
+        opacity=0.6
     )
-    fig.update_traces(marker=dict(size=5, line=dict(width=0)))
+    fig.update_traces(marker=dict(size=7, line=dict(width=0)))
+    
     return fig
+
 
 def get_boxplot():
     data = get_dataframe("./dataset/spotify_songs_clean.csv")
