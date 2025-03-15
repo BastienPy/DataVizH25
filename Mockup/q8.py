@@ -69,7 +69,8 @@ def get_hover_template(type_name):
 
 def get_figure_genre():
     genre_data = data_preprocess("./dataset/spotify_songs_clean.csv", "playlist_genre")
-    fig = px.area(genre_data, x="decennie", y="percentage", color="playlist_genre", line_group="playlist_genre", hover_data=["playlist_genre"])
+    fig = px.area(genre_data, x="decennie", y="percentage", color="playlist_genre", line_group="playlist_genre", hover_data=["playlist_genre"],
+                  color_discrete_sequence=px.colors.qualitative.Dark2)
 
     fig.update_layout(height=500)
     fig.update_traces(hovertemplate=get_hover_template("Genre"))
