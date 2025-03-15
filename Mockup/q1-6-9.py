@@ -43,26 +43,69 @@ app = dash.Dash(__name__)
 server = app.server  
 
 
-# app layout
+# App layout
 app.layout = html.Div([
     html.H1("Évolution des caractéristiques audio et leur impact sur la popularité"),
     
+    html.Label("Sélectionnez l'intervalle de temps :"),
     
-    html.Label("Sélectionnez la plage temporelle :"),
+    # choisir entre year et décennie
+    dcc.RadioItems(
+        id="time-interval",
+        options=[
+            {"label": "Décennie", "value": "decade"},
+            {"label": "Année", "value": "year"}
+        ],
+        value="decade",  # par default
+        inline=True
+    ),
     
-    # slider plage temp
+    # sélectionner la plage temporelle
     dcc.RangeSlider(
         id="year-slider",
         min=df["year"].min(),
         max=df["year"].max(),
-        value=[df["year"].max() - 10, df["year"].max()],  # 10 dernieres annees par default
-        marks={str(year): str(year) for year in range(df["year"].min(), df["year"].max()+1, 5)},
-        step=1
+        value=[2010, 2020],  # Default selection (2010-2020)
+        marks={str(year): str(year) for year in range(df["year"].min(), df["year"].max()+1, 10)},  # Default: decades
+        step=10  # Default to decade selection
     ),
 
-    # small multiples 
+    # Small multiples 
     html.Div(id="charts-container", style={"display": "grid", "grid-template-columns": "repeat(5, 1fr)", "gap": "20px"})
 ])
+
+# update le slider selon l'option du button-radio
+@app.callback(
+    Output("year-slider", "step"),
+    Output("year-slider", "marks"),
+    Output("year-slider", "value"),
+    [Input("time-interval", "value"),
+     Input("year-slider", "value")]
+)
+def update_slider_mode(mode, current_range):
+    # extract user's current selection
+    start_year, end_year = current_range
+
+    if mode == "year":
+        step = 1  # step par année
+        marks = {str(year): str(year) for year in range(df["year"].min(), df["year"].max()+1, 5)}  # marquer pour chaque 5 anées
+        # ajuster l'interval sans reset
+        value = [
+            max(df["year"].min(), start_year), 
+            min(df["year"].max(), end_year)
+        ]
+    else:  # decade
+        step = 10  # step par décennie
+        marks = {str(year): str(year) for year in range(df["year"].min(), df["year"].max()+1, 10)}  # Show every decade
+        
+        # Arroundir à la plus proche décennie
+        value = [
+            max(df["year"].min(), round(start_year / 10) * 10), 
+            min(df["year"].max(), round(end_year // 10) * 10)
+        ]
+
+    return step, marks, value
+
 
 
 # update les graph selon les plages tempo
@@ -77,14 +120,15 @@ def update_charts(selected_years):
     charts = []
     
     for feature in carac_audio:
+        filtered_df["fixed_size"] = 20 # adding a dummy colon to have a fixed size for bubbles
         
         fig = px.scatter(
             filtered_df, 
             x=feature,  # x-axis: carac audio
             y="track_popularity",  # y-axis: popularité
-            size="track_popularity",  # à changer après
+            size='fixed_size', 
             color="year",  # couleur pour l'année
-            title=f"Impact de {feature} sur la popularité",
+            title=f"{feature.capitalize()} vs Popularité",
             labels={"track_popularity": "Popularité Moyenne", feature: feature.capitalize(), "year": "Année"},
         )
         fig.update_traces(
@@ -96,6 +140,7 @@ def update_charts(selected_years):
             )
         )
         fig.update_layout(
+            title_x=0.5,  # titre au centre
             yaxis_title="Popularité", 
             xaxis_title=feature.capitalize(),
             height=320,
@@ -105,7 +150,6 @@ def update_charts(selected_years):
     
     return charts
 
-# ouvrir l'appli
-if __name__ == "__main__":
-    webbrowser.open_new("http://127.0.0.1:8080/")
+# ouvrir l'appli 
+if __name__ == '__main__':
     app.run_server(debug=True)
