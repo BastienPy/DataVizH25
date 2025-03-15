@@ -126,7 +126,7 @@ def display_area(selected_genre):
     fig.update_layout(legend_title_text="Sous genre de " + selected_genre)
     return fig
 
-def data_preprocess_popular_artists(path, genre, popularity_threshold=90):
+def data_preprocess_popular_artists(path, genre, popularity_threshold=70):
     data = get_dataframe(path)
     data = data[data["playlist_genre"] == genre]  # Filter by genre
     data["year"] = data["track_album_release_date"].dt.year

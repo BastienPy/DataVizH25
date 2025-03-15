@@ -69,7 +69,8 @@ def get_hover_template(type_name):
 
 def get_figure_genre():
     genre_data = data_preprocess("./dataset/spotify_songs_clean.csv", "playlist_genre")
-    fig = px.area(genre_data, x="decennie", y="percentage", color="playlist_genre", line_group="playlist_genre", hover_data=["playlist_genre"])
+    fig = px.area(genre_data, x="decennie", y="percentage", color="playlist_genre", line_group="playlist_genre", hover_data=["playlist_genre"],
+                  color_discrete_sequence=px.colors.qualitative.Dark2)
 
     fig.update_layout(height=500)
     fig.update_traces(hovertemplate=get_hover_template("Genre"))
@@ -83,20 +84,27 @@ app = dash.Dash(__name__)
 
 app.layout = html.Div([
     html.H4("Évolution de la proportion de genres et sous-genres musicaux par décennie", style={"fontWeight": "bold", "fontSize": "30px"}),
-    html.H4("Évolution de la proportion des genres", style={"fontWeight": "bold", "fontSize": "20px"}),
-    dcc.Graph(id="graph", figure = get_figure_genre()),
-    html.H4("Évolution de la proportion des sous genres du genre choisi", style={"fontWeight": "bold", "fontSize": "20px"}),
     html.Div([
-        html.Button("EDM", id="edm-button", n_clicks=0),
-        html.Button("Latin", id="latin-button", n_clicks=0),
-        html.Button("Pop", id="pop-button", n_clicks=0),
-        html.Button("R&B", id="r&b-button", n_clicks=0),
-        html.Button("Rap", id="rap-button", n_clicks=0),
-        html.Button("Rock", id="rock-button", n_clicks=0)
-        
-    ], style={"display": "flex", "gap": "5px", "margin-bottom": "20px"}),
-    dcc.Graph(id="subgenre_graph"),
+        html.Div([
+            html.H4("Évolution de la proportion des genres", style={"fontWeight": "bold", "fontSize": "20px"}),
+            dcc.Graph(id="graph", figure=get_figure_genre())
+        ], style={"width": "50%", "display": "inline-block"}),
+        html.Div([
+            html.H4("Évolution de la proportion des sous genres du genre choisi", style={"fontWeight": "bold", "fontSize": "20px"}),
+            html.Div([
+                html.Button("EDM", id="edm-button", n_clicks=0),
+                html.Button("Latin", id="latin-button", n_clicks=0),
+                html.Button("Pop", id="pop-button", n_clicks=0),
+                html.Button("R&B", id="r&b-button", n_clicks=0),
+                html.Button("Rap", id="rap-button", n_clicks=0),
+                html.Button("Rock", id="rock-button", n_clicks=0)
+            ], style={"display": "flex", "gap": "5px", "margin-top": "20px"}),
+            dcc.Graph(id="subgenre_graph"),
+        ], style={"width": "50%", "display": "inline-block", "verticalAlign": "top"})
+    ], style={"display": "flex"})
 ])
+
+
 
 @app.callback(
     Output("subgenre_graph", "figure"),
