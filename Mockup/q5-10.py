@@ -80,12 +80,12 @@ def create_dashboard(df):
 
         graphs = []
         for feature in features:
-            fig = px.line(
-                x=df_low_filtered["year_month"], y=df_low_filtered[feature],
-                labels={"x": "Année", "y": f"{feature.capitalize()} Moyenne"},
-                title=f"Évolution de {feature.capitalize()} pour {selected_genre} (Popularité ≤ {popularity_threshold})"
+            fig = px.line(x=df_low_filtered["year_month"], y=df_low_filtered[feature],labels={"x": "Année", "y": f"{feature.capitalize()} Moyenne"},
+                    title=f"Évolution de {feature.capitalize()}"
             )
-            fig.add_scatter(x=df_high_filtered["year_month"], y=df_high_filtered[feature], mode='lines', name=f"Popularité ≥ {popularity_threshold}")
+            fig.add_scatter(x=df_high_filtered["year_month"], y=df_high_filtered[feature], mode='lines', name=f"Popularité > {popularity_threshold}")
+            fig.add_scatter(x=df_low_filtered["year_month"], y=df_low_filtered[feature], mode='lines', name=f"Popularité <= {popularity_threshold}")
+            
             fig.update_xaxes(tickformat="%Y", nticks=10)
             graphs.append(fig)
 
