@@ -4,7 +4,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.express as px
-import itertools
 
 def convert_date(date):
     try:
@@ -62,6 +61,38 @@ def data_preprocess(path, filter_type, filter_value=None, genre_filter=None):
     genre_data = (genre_data.div(total_songs_by_decennie, axis=0) * 100).reset_index()
     genre_data = genre_data.melt(id_vars="decennie", var_name=group_by_column, value_name="percentage")
     return genre_data
+
+def data_preprocess_artist_cumulative(path, artist, genre_filter):
+    data = get_dataframe(path)
+    # Filtrer pour l'artiste et le genre sélectionnés
+    data = data[(data["track_artist"] == artist) & (data["playlist_genre"] == genre_filter)]
+    # Formater la date
+    data["formatted_date"] = pd.to_datetime(data["track_album_release_date"]).dt.strftime("%Y-%m-%d")
+    
+    # Grouper par date et sous-genre et compter le nombre de chansons
+    grouped = data.groupby(["formatted_date", "playlist_subgenre"]).size().reset_index(name="count")
+    # Pivot pour avoir une ligne par date et une colonne par sous-genre
+    pivot = grouped.pivot(index="formatted_date", columns="playlist_subgenre", values="count").fillna(0)
+    
+    # S'assurer que l'index (date) est de type datetime et trié
+    pivot.index = pd.to_datetime(pivot.index)
+    pivot = pivot.sort_index()
+    
+    # Calcul de la somme cumulée par sous-genre sur le temps
+    cum = pivot.cumsum()
+    # Pour chaque date, calculer le total cumulé de toutes les chansons
+    total_cum = cum.sum(axis=1)
+    # Calculer le pourcentage cumulatif pour chaque sous-genre
+    cum_percent = cum.div(total_cum, axis=0) * 100
+    
+    # Repasser en format "long" pour Plotly Express
+    cum_percent = cum_percent.reset_index().melt(
+        id_vars="formatted_date", var_name="playlist_subgenre", value_name="percentage"
+    )
+    cum_percent["formatted_date"] = pd.to_datetime(cum_percent["formatted_date"])
+    cum_percent = cum_percent.sort_values("formatted_date")
+    
+    return cum_percent
 
 #Custom binning preprocessing function with 10 bins over a dynamic time range
 def data_preprocess_custom(path, filter_type, filter_value=None, genre_filter=None, bins=10, start_date=None, end_date=None):
@@ -182,7 +213,7 @@ def get_hover_template_custom(type_name):
 app = dash.Dash(__name__)
 
 app.layout = html.Div([
-    html.H4("Évolution de la proportion des sous-genres musicaux par décennie",
+    html.H4("Évolution de la proportion des sous-genres musicaux par genre et artiste",
             style={"fontWeight": "bold", "fontSize": "30px", "textAlign": "center"}),
     
     html.Div([
@@ -279,7 +310,7 @@ def update_subgenre_graph(selected_genre, selected_artist):
             fig.update_layout(legend_title_text="Sous-genre de " + selected_genre)
             fig.update_layout(legend=dict(traceorder='reversed'))
             # Update x-axis to show formatted dates instead of numeric timestamps
-            fig.update_xaxes(title_text="Date", tickformat="%Y/%m/%d")
+            fig.update_xaxes(title_text="Date", tickformat="%Y")
     else:
         # When only a genre is selected, use the cached (decade-based) figure
         fig = subgenre_cache[selected_genre]
@@ -327,25 +358,26 @@ def update_artist_subgenre_graph(selected_genre, selected_artist):
                            showarrow=False)
         return fig
 
-    # Use the new helper function that groups by the exact release date
-    artist_data = data_preprocess_artist("./dataset/spotify_songs_clean.csv", selected_artist, selected_genre)
+    # Utiliser la nouvelle fonction qui calcule les proportions cumulées
+    artist_data = data_preprocess_artist_cumulative("./dataset/spotify_songs_clean.csv", selected_artist, selected_genre)
     
-    # Create the area graph with the formatted_date as the x-axis
+    # Création du graphique en aires avec les dates formatées
     fig = px.area(artist_data, x="formatted_date", y="percentage", color="playlist_subgenre",
                   line_group="playlist_subgenre", hover_data=["playlist_subgenre"],
                   color_discrete_map=color_map)
     
-    fig.update_layout(height=500, title=f"Évolution des sous-genres pour {selected_artist} ({selected_genre})")
-    # Update the hover template to show the date in the desired format
+    fig.update_layout(height=500, title=f"Évolution cumulée des sous-genres pour {selected_artist} ({selected_genre})")
+    # Personnalisation du hover pour afficher la date au format souhaité
     fig.update_traces(hovertemplate=(
         "<b>Sous-genre:</b> %{customdata[0]}<br>"
         "<b>Date:</b> %{x|%Y-%m-%d}<br>"
-        "<b>Pourcentage:</b> %{y:.3f}%<extra></extra>"
+        "<b>Pourcentage cumulatif:</b> %{y:.3f}%<extra></extra>"
     ))
-    fig.update_yaxes(title_text='Pourcentage (%)')
+    fig.update_yaxes(title_text='Pourcentage cumulatif (%)')
     fig.update_layout(legend_title_text="Sous-genre", legend=dict(traceorder='reversed'))
     
     return fig
+
 
 
 if __name__ == '__main__':
