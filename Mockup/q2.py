@@ -1,119 +1,193 @@
-import pandas as pd
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output
-import plotly.express as px
+from dash import dcc, html, Input, Output, State
+import plotly.graph_objs as go
+import numpy as np
+import pandas as pd
+
+# Initialize Dash app
+app = dash.Dash(__name__)
+
+# Define matrix size
+x_size = 10
+y_size = 6
+
+# Labels for axes (Inverted Y-axis)
+y_labels = ["Pop", "Latin", "R&B", "Rap", "EDM", "Rock"][::-1]  # Inverse l'ordre
+x_labels = ["Loudness", "Energy", "Acousticness", "Valence", "Danceability", 
+            "Tempo", "Instrumentalness", "Duration_ms", "Speechiness", "Liveness"]
+
+# Default color mapping (white for 0, green for 1)
+color_map = {0: "white", 1: "#008000"}  # Green for 1, white for 0
+
+# Data matrix (Green = 1, White = 0)
+arr = np.array([[1,1,1,1,1,1,0,0,0,0],
+                [1,1,1,1,1,1,0,0,0,0],
+                [1,1,1,1,1,1,0,0,0,0],
+                [1,1,1,1,0,0,1,0,0,0],
+                [1,1,1,1,1,1,1,1,0,1],
+                [1,1,1,1,1,1,0,1,1,0]])[::-1].copy()  # Inverse aussi les valeurs de la matrice
+
+# Convert matrix values to colors
+colors = np.vectorize(color_map.get)(arr)
+
+def create_figure(colors):
+    """Creates a new figure based on the color matrix."""
+    fig = go.Figure(
+        layout={
+            'height': 500,
+            'width': 700,
+            'xaxis': {
+                'showgrid': False,
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': np.arange(x_size),
+                'ticktext': x_labels,
+                'tickangle': -45  # Rotate labels for readability
+            },
+            'yaxis': {
+                'showgrid': False,
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': np.arange(y_size),
+                'ticktext': y_labels
+            },
+            'plot_bgcolor': 'rgba(0,0,0,0)'  # Transparent background
+        }
+    )
+
+    # Add scatter points for each column
+    for i in range(x_size):
+        fig.add_scatter(
+            x=np.ones(y_size) * i,
+            y=np.arange(y_size),
+            mode='markers',
+            hoverinfo="none",  # No tooltip
+            marker={
+                'symbol': 'square',
+                'size': 40,
+                'color': colors[:, i],  # Use dynamic colors
+                'showscale': False
+            },
+            showlegend=False
+        )
+    
+    return fig
+
+# Dash layout
+app.layout = html.Div([
+    html.H2("Music Genre vs Audio Features", style={'textAlign': 'center'}),
+
+    dcc.Store(id="color-store", data=colors.tolist()),
+    dcc.Store(id="selected-column", data=None),  # Store the selected column index
+
+    # Centered heatmap
+    html.Div(
+        dcc.Graph(
+            id="music-matrix",
+            figure=create_figure(colors),
+            config={'staticPlot': False}  # Allows interaction
+        ),
+        style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}
+    ),
+
+    # Centered legend
+    html.Div([
+        html.Div(style={'display': 'flex', 'alignItems': 'center'}, children=[
+            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': '#90EE90', 'marginRight': '10px'}),
+            html.Span("Caractéristique sélectionnée")
+        ]),
+        html.Div(style={'display': 'flex', 'alignItems': 'center'}, children=[
+            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': 'red', 'marginRight': '10px'}),
+            html.Span("Corrélation négative")
+        ]),
+        html.Div(style={'display': 'flex', 'alignItems': 'center'}, children=[
+            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': 'yellow', 'marginRight': '10px'}),
+            html.Span("Corrélation positive")
+        ])
+    ], style={'display': 'flex', 'justifyContent': 'center', 'gap': '20px', 'marginTop': '20px'})
+])
+
 
 def get_dataframe(path):
     data = pd.read_csv(path)
-    data["track_album_release_date"] = pd.to_datetime(data["track_album_release_date"], format="mixed", errors="coerce")
-    data = data[data["track_album_release_date"].dt.year >= 1970] # On ne garde que les musiques après 1970, car il n'y a pas assez d'échantillons avant
+    data["track_album_release_date"] = pd.to_datetime(data["track_album_release_date"])
+    data = data.groupby("playlist_genre").apply(lambda x: x.nlargest(1000, "track_popularity")).reset_index(drop=True)
+    excluded_artists = [
+        "The Sleep Specialist", "Nature Sounds", "Natural Sound Makers", "Mother Nature Sound FX",
+        "Rain Recordings", "Pinetree Way", "Aquagirl", "Rain Sounds FX", "Relax Meditate Sleep",
+        "Life Sounds Nature"
+    ]
+    data = data[~data["track_artist"].isin(excluded_artists)]
+    data = data[data["track_album_release_date"].dt.year >= 1970]
     return data
 
+def calculate_average_instrumentalness(data):
+    """Calculate the average instrumentalness for all songs and for each genre."""
 
-def get_figure(genre=None):
-    data = get_dataframe("./dataset/spotify_songs_clean.csv")
-    if genre:
-        data = data[data['playlist_genre'] == genre]
-    # Sélectionner uniquement les colonnes numériques
-    numeric_data = data.select_dtypes(include=['number']).drop(columns=['key', 'track_popularity', 'mode'])
-    # Calculer la matrice de corrélation
-    corr_matrix = numeric_data.corr()
-    corr_matrix = corr_matrix.applymap(lambda x: round(x, 2))  # Optional: round to 2 decimal places for readability
-    corr_matrix = corr_matrix.clip(lower=-1, upper=1)  # Ensure the scale is between -1 and 1
-    # Afficher la matrice avec plotly
-    fig = px.imshow(corr_matrix,
-                    text_auto=False,
-                    aspect="auto",
-                    title=f"Correlation Matrix for {genre}" if genre else "Correlation Matrix",
-                    color_continuous_scale="Viridis",
-                    zmin=-0.65,
-                    zmax=0.8)
-    fig.update_layout(width=800, height=600)
-    return fig
+    overall_avg = data["duration_ms"].mean()
+    genre_avg = data.groupby("playlist_genre")["duration_ms"].mean()
+    return overall_avg, genre_avg
 
-app = dash.Dash(__name__)
-
-app.layout = html.Div([
-    html.H4("Corrélation entre les caractéristiques audio", style={"fontWeight": "bold", "fontSize": "30px"}),
-    dcc.Graph(id="graph", figure = get_figure()),
-])
-
+data = get_dataframe('dataset\spotify_songs_clean.csv')
+a,b=calculate_average_instrumentalness(data)
+print(a,b)
 @app.callback(
-    Output("scatter-plot", "figure"),
-    [Input("graph", "clickData")]
+    Output("music-matrix", "figure"),
+    Output("selected-column", "data"),
+    Input("music-matrix", "clickData"),
+    State("color-store", "data"),
+    State("selected-column", "data")
 )
-def update_scatter_plot(clickData):
+def update_on_click(clickData, stored_colors, selected_column):
+    """Changes clicked column to light green, with special conditions for 'Instrumentalness'."""
+    stored_colors = np.array(stored_colors)  # Convert back to array
+
     if clickData is None:
-        return dash.no_update
-    
-    data = get_dataframe("./dataset/spotify_songs_clean.csv")
-    numeric_data = data.select_dtypes(include=['number'])
-    corr_matrix = numeric_data.corr()
+        return create_figure(stored_colors), selected_column  # No click, keep default
 
-    x_feature = clickData['points'][0]['x']
-    y_feature = clickData['points'][0]['y']
+    # Get clicked point index
+    point = clickData["points"][0]
+    x = int(point["x"])  # Only track the column (x-axis)
 
-    if x_feature == y_feature:
-        return dash.no_update
+    # If the same column is clicked again, reset selection
+    if selected_column == x:
+        return create_figure(stored_colors), None
 
-    scatter_fig = px.scatter(data, x=x_feature, y=y_feature, title=f"Scatter plot of {x_feature} vs {y_feature}")
-    scatter_fig.update_layout(width=800, height=600)
-    parallel_fig = px.parallel_coordinates(data, dimensions=[x_feature, y_feature], title=f"Parallel Coordinates of {x_feature} and {y_feature}")
-    parallel_fig.update_layout(width=800, height=600)
-    return scatter_fig
+    # Make a temporary copy of colors for click effect
+    temp_colors = stored_colors.copy()
 
-app.layout = html.Div([
-    html.H4("Corrélation entre les caractéristiques audio", style={"fontWeight": "bold", "fontSize": "30px"}),
-    html.Div([
-        html.Button("All", id="all-button", n_clicks=0),
-        html.Button("Pop", id="pop-button", n_clicks=0),
-        html.Button("Rap", id="rap-button", n_clicks=0),
-        html.Button("Rock", id="rock-button", n_clicks=0),
-        html.Button("Latin", id="latin-button", n_clicks=0),
-        html.Button("R&B", id="rnb-button", n_clicks=0),
-        html.Button("EDM", id="edm-button", n_clicks=0),
-    ], style={"display": "flex", "gap": "5px", "margin-bottom": "20px"}),
-    html.Div([
-        dcc.Graph(id="graph", figure=get_figure()),
-        dcc.Graph(id="scatter-plot")
-    ], style={"display": "flex"})
-])
+    # Change the entire column to light green (except white cases)
+    for y in range(y_size):
+        if temp_colors[y, x] != "white":  # Keep white cases unchanged
+            temp_colors[y, x] = "#90EE90"  # Light green
 
-@app.callback(
-    Output("graph", "figure"),
-    [Input("all-button", "n_clicks"),
-     Input("pop-button", "n_clicks"),
-     Input("rap-button", "n_clicks"),
-     Input("rock-button", "n_clicks"),
-     Input("edm-button", "n_clicks"),
-     Input("rnb-button", "n_clicks"),
-     Input("latin-button", "n_clicks")]
-)
-def update_graph(all_clicks, pop_clicks, rock_clicks, hiphop_clicks, electronic_clicks, rnb_clicks, jazz_clicks):
-    ctx = dash.callback_context
+    # If clicking "Instrumentalness"
+    if x_labels[x] == "Instrumentalness":
+        # Rap row index = 1, EDM row index = 0 (adjusted for reversed order)
+        rap_idx = 2
+        edm_idx = 1
 
-    if not ctx.triggered:
-        return get_figure()
-    else:
-        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        # Column indices for special changes
+        acousticness_idx = x_labels.index("Acousticness")
+        loudness_idx = x_labels.index("Loudness")
+        energy_idx = x_labels.index("Energy")
+        duration_ms_idx = x_labels.index("Duration_ms")
 
-    genre = None
-    if button_id == "pop-button":
-        genre = "pop"
-    elif button_id == "rap-button":
-        genre = "rap"
-    elif button_id == "rock-button":
-        genre = "rock"
-    elif button_id == "edm-button":
-        genre = "edm"
-    elif button_id == "rnb-button":
-        genre = "r&b"
-    elif button_id == "edm-button":
-        genre = "edm"
+        # Apply special color rules while keeping the column light green
+        if temp_colors[rap_idx, acousticness_idx] != "white":
+            temp_colors[rap_idx, acousticness_idx] = "yellow"
+        if temp_colors[rap_idx, loudness_idx] != "white":
+            temp_colors[rap_idx, loudness_idx] = "red"
+        if temp_colors[rap_idx, energy_idx] != "white":
+            temp_colors[rap_idx, energy_idx] = "red"
+        if temp_colors[edm_idx, loudness_idx] != "white":
+            temp_colors[edm_idx, loudness_idx] = "red"
+        if temp_colors[edm_idx, duration_ms_idx] != "white":
+            temp_colors[edm_idx, duration_ms_idx] = "yellow"
 
-    return get_figure(genre)
+    return create_figure(temp_colors), x
 
 
-app.run_server(debug=False)
+# Run app
+if __name__ == '__main__':
+    app.run_server(debug=True)
