@@ -59,6 +59,7 @@ def get_figure():
         xaxis_title="Nombre de sous-genres", xaxis=dict(showgrid=True),
         yaxis_title="Popularité moyenne", yaxis=dict(showgrid=True),
         showlegend=True,
+        legend_title_text="Légende",
         plot_bgcolor='#f5f6f7',
         height=600,
     )
