@@ -255,8 +255,12 @@ def update_artist_options(selected_genre):
     data = get_dataframe("./dataset/spotify_songs_clean.csv")
     # Filter data to only include songs from the selected genre
     data = data[data["playlist_genre"] == selected_genre]
-    artists = data['track_artist'].unique()
-    options = [{'label': artist, 'value': artist} for artist in artists]
+    # Count unique songs per artist (assuming the CSV contains a 'track_name' column)
+    artist_counts = data.groupby("track_artist")["track_name"].nunique().reset_index(name="song_count")
+    # Sort artists by the number of unique songs in descending order
+    artist_counts = artist_counts.sort_values("song_count", ascending=False)
+    # Create the dropdown options list using the sorted order
+    options = [{'label': artist, 'value': artist} for artist in artist_counts["track_artist"]]
     # Reset the selected artist value to None
     return options, None
 
