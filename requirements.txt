@@ -4,5 +4,5 @@ matplotlib
 seaborn
 torch
 torchvision
-dash 
+dash==2.18.2
 plotly
