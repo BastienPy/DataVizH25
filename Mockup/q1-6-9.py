@@ -1,7 +1,9 @@
 import pandas as pd
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+# import dash_core_components as dcc
+from dash import dcc
+from dash import html
+# import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.express as px
 import webbrowser
@@ -120,7 +122,9 @@ def update_charts(selected_years):
     charts = []
     
     for feature in carac_audio:
-        filtered_df["fixed_size"] = 20 # adding a dummy colon to have a fixed size for bubbles
+        filtered_df = df[(df["year"] >= start_year) & (df["year"] <= end_year)].copy()
+        filtered_df["fixed_size"] = 20  # adding a dummy column to have a fixed size for bubbles
+
         
         fig = px.scatter(
             filtered_df, 
@@ -150,6 +154,7 @@ def update_charts(selected_years):
     
     return charts
 
+print(dash.__version__)
 # ouvrir l'appli 
 if __name__ == '__main__':
     app.run_server(debug=True)
