@@ -23,12 +23,13 @@ def get_figure(genre=None):
     data = get_dataframe("./dataset/spotify_songs_clean.csv")
     if genre:
         data = data[data['playlist_genre'] == genre]
-    numeric_data = data.select_dtypes(include=['number']).drop(columns=['key', 'track_popularity', 'mode'])
+    numeric_data = data.select_dtypes(include=['number']).drop(columns=['key', 'mode'])
+    numeric_data = (numeric_data - numeric_data.mean()) / numeric_data.std()
     corr_matrix = numeric_data.corr()
     corr_matrix = corr_matrix.applymap(lambda x: round(x, 2))
     
     # Masquer les valeurs inférieures à 0.1
-    corr_matrix = corr_matrix.where(abs(corr_matrix) > 0.1, np.nan)
+    corr_matrix = corr_matrix.where(abs(corr_matrix) > 0.19, np.nan)
     
     fig = px.imshow(
         corr_matrix,
