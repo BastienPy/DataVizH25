@@ -11,10 +11,21 @@ carac_audio = [
 
 def preprocess_data():
     df = pd.read_csv(dataset_path)
+    
+    
+    # release date -> datetime et extract year
     df["track_album_release_date"] = pd.to_datetime(df["track_album_release_date"], errors="coerce")
     df["year"] = df["track_album_release_date"].dt.year
+    # print(df)
+    
+    
+    # garder les données après 1970
     df = df[df["year"] >= 1970]
+    # print(df)
+    
+    # moyenne de popularite par an pour chaque carcteristique audio
     grouped_df = df.groupby("year")[["track_popularity"] + carac_audio].mean().reset_index()
+    #  print(grouped_df)
     return grouped_df
 
 df = preprocess_data()
@@ -73,8 +84,9 @@ def register_callbacks(app):
         filtered_df = df[(df["year"] >= start_year) & (df["year"] <= end_year)]
         charts = []
         for feature in carac_audio:
-            # Add a fixed-size column for bubble charts.
-            filtered_df["fixed_size"] = 20  
+            filtered_df = df[(df["year"] >= start_year) & (df["year"] <= end_year)].copy()
+            filtered_df["fixed_size"] = 20  # adding a dummy column to have a fixed size for bubbles
+            
             fig = px.scatter(
                 filtered_df, 
                 x=feature,  

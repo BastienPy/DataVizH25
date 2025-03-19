@@ -2,52 +2,51 @@ import dash
 from dash import dcc, html, Input, Output
 
 # Create the main Dash app instance.
-# Using suppress_callback_exceptions is useful in multipage apps.
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 app.title = 'Spotify Songs Analysis'
 
-# Import your page modules.
+# Import page sections.
 import q1
 import q2
 
-# Register the page-specific callbacks.
+# Register callbacks for both sections.
 q1.register_callbacks(app)
 q2.register_callbacks(app)
 
-# Define a sidebar with links to each page.
+# Create a sidebar with anchor links for scrolling.
 sidebar = html.Div(
     [
         html.H2("Navigation", style={'textAlign': 'center'}),
         html.Hr(),
-        dcc.Link("Page Q1", href="/q1"),
-        html.Br(),
-        dcc.Link("Page Q2", href="/q2"),
+        # The href targets the div id on the page
+        html.A("Go to Q1 Section", href="#q1-section", style={'display': 'block', 'margin-bottom': '10px'}),
+        html.A("Go to Q2 Section", href="#q2-section", style={'display': 'block'})
     ],
-    style={'padding': '20px', 'width': '20%', 'display': 'inline-block', 'verticalAlign': 'top'}
+    style={'padding': '20px', 'width': '20%', 'position': 'fixed', 'height': '100%', 'overflowY': 'auto'}
 )
 
-# Content container: page layouts will be rendered here.
-content = html.Div(id="page-content", style={'padding': '20px', 'width': '75%', 'display': 'inline-block'})
+# Main content that includes both q1 and q2 sections.
+content = html.Div(
+    [
+        # Q1 Section with an id for the anchor link.
+        html.Div(
+            q1.layout,
+            id="q1-section",
+            style={"padding-top": "60px", "margin-top": "-60px"}
+        ),
+        html.Hr(),
+        # Q2 Section with an id for the anchor link.
+        html.Div(
+            q2.layout,
+            id="q2-section",
+            style={"padding-top": "60px", "margin-top": "-60px"}
+        )
+    ],
+    style={'margin-left': '22%', 'padding': '20px'}
+)
 
-# Define the overall app layout with a Location component.
-app.layout = html.Div([
-    dcc.Location(id="url", refresh=False),
-    sidebar,
-    content
-])
-
-# Callback to update the content based on the URL.
-@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
-def display_page(pathname):
-    if pathname == "/q1":
-        return q1.layout
-    elif pathname == "/q2":
-        return q2.layout
-    else:
-        return html.Div([
-            html.H1("Welcome to Spotify Songs Analysis"),
-            html.P("Select a page from the sidebar.")
-        ])
+# Overall layout.
+app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 
 if __name__ == '__main__':
     app.run_server(debug=True)
