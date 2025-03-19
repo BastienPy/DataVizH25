@@ -12,7 +12,7 @@ def get_dataframe(path):
     """Load and preprocess the Spotify dataset."""
     data = pd.read_csv(path)
     data["track_album_release_date"] = pd.to_datetime(data["track_album_release_date"])
-    data = data.groupby("playlist_genre").apply(lambda x: x.nlargest(1000, "track_popularity")).reset_index(drop=True)
+    #data = data.groupby("playlist_genre").apply(lambda x: x.nlargest("track_popularity")).reset_index(drop=True)
     excluded_artists = [
         "The Sleep Specialist", "Nature Sounds", "Natural Sound Makers", "Mother Nature Sound FX",
         "Rain Recordings", "Pinetree Way", "Aquagirl", "Rain Sounds FX", "Relax Meditate Sleep",
@@ -167,7 +167,6 @@ def update_on_click(clickData, stored_colors):
     speechiness_idx = x_labels.index("speechiness")
     liveness_idx = x_labels.index("liveness")
 
-
     correlations = {
         pop_idx: {
             (loudness_idx, energy_idx): 0.67,
@@ -242,7 +241,6 @@ def update_on_click(clickData, stored_colors):
                     target_feature = feature2 if feature1 == selected_idx else feature1 
                     if temp_colors[genre, target_feature] != "white":
                         temp_colors[genre, target_feature] = "red" if value < 0 else "yellow"
-
 
     if selected_characteristic in x_labels:
         update_colors(selected_characteristic, temp_colors)
