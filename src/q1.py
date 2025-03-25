@@ -47,7 +47,7 @@ layout = html.Div([
         id="year-slider",
         min=df["year"].min(),
         max=df["year"].max(),
-        value=[2010, 2020],
+        value=[1970, 2020],
         marks={str(year): str(year) for year in range(df["year"].min(), df["year"].max()+1, 10)},
         step=10
     ),
@@ -88,22 +88,16 @@ def register_callbacks(app):
             filtered_df = df[(df["year"] >= start_year) & (df["year"] <= end_year)].copy()
             filtered_df["fixed_size"] = 20  # adding a dummy column to have a fixed size for bubbles
             
+            # getting index of last subchart in row
+            show_colorbar = ((i + 1) % 3 == 0) or (i == len(carac_audio) - 1)
+            
             fig = px.scatter(
                 filtered_df, 
                 x=feature,  
                 y="track_popularity",  
                 size='fixed_size', 
                 color="year",
-                color_continuous_scale="Viridis",  
-                # color_continuous_scale=[
-                #     [0.0, "#000000"],
-                #     [0.1, "#121212"],
-                #     [0.2, "#212121"],
-                #     [0.4, "#535353"],
-                #     [0.6, "#b3b3b3"],
-                #     [0.8, "#70d97c"],
-                #     [1.0, "#1db954"]
-                # ],
+                color_continuous_scale="Viridis",
                 title=f"{feature.capitalize()} vs Popularité",
                 labels={"track_popularity": "Popularité Moyenne", feature: feature.capitalize(), "year": "Année"},
             )
@@ -115,6 +109,9 @@ def register_callbacks(app):
                     "Année: %{marker.color}"
                 )
             )
+            #showing year color only once per row 
+            if not show_colorbar:
+                fig.update_coloraxes(showscale=False)
             fig.update_layout(
                 title_x=0.5,
                 yaxis_title="Popularité", 
