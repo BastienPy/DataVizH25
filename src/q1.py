@@ -51,7 +51,7 @@ layout = html.Div([
         marks={str(year): str(year) for year in range(df["year"].min(), df["year"].max()+1, 10)},
         step=10
     ),
-    html.Div(id="charts-container", style={"display": "grid", "grid-template-columns": "repeat(5, 1fr)", "gap": "20px"})
+    html.Div(id="charts-container", style={"display": "grid", "grid-template-columns": "repeat(3, 1fr)", "gap": "30px"})
 ])
 
 # Register callbacks with the main app.
@@ -83,7 +83,8 @@ def register_callbacks(app):
         start_year, end_year = selected_years
         filtered_df = df[(df["year"] >= start_year) & (df["year"] <= end_year)]
         charts = []
-        for feature in carac_audio:
+        total_features = len(carac_audio)
+        for i, feature in enumerate(carac_audio):
             filtered_df = df[(df["year"] >= start_year) & (df["year"] <= end_year)].copy()
             filtered_df["fixed_size"] = 20  # adding a dummy column to have a fixed size for bubbles
             
@@ -108,8 +109,16 @@ def register_callbacks(app):
                 title_x=0.5,
                 yaxis_title="Popularité", 
                 xaxis_title=feature.capitalize(),
-                height=320,
+                height=350,
                 showlegend=True  
             )
-            charts.append(html.Div(dcc.Graph(figure=fig), style={"width": "100%", "textAlign": "center"}))
+            # centering last row
+            remaining = total_features % 3
+            is_last = i == total_features - 1
+            needs_centering = remaining == 1 and is_last
+            style = {"width": "100%", "textAlign": "center"}
+            if needs_centering:
+                style["gridColumn"] = "2 / 3"  # center in the second column of 3
+            charts.append(html.Div(dcc.Graph(figure=fig), style=style))
+
         return charts
