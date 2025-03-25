@@ -93,7 +93,17 @@ def register_callbacks(app):
                 x=feature,  
                 y="track_popularity",  
                 size='fixed_size', 
-                color="year",  
+                color="year",
+                color_continuous_scale="Viridis",  
+                # color_continuous_scale=[
+                #     [0.0, "#000000"],
+                #     [0.1, "#121212"],
+                #     [0.2, "#212121"],
+                #     [0.4, "#535353"],
+                #     [0.6, "#b3b3b3"],
+                #     [0.8, "#70d97c"],
+                #     [1.0, "#1db954"]
+                # ],
                 title=f"{feature.capitalize()} vs Popularité",
                 labels={"track_popularity": "Popularité Moyenne", feature: feature.capitalize(), "year": "Année"},
             )
