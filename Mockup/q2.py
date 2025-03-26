@@ -99,34 +99,54 @@ app.layout = html.Div([
     dcc.Store(id="color-store", data=colors.tolist()),
     dcc.Store(id="selected-column", data=None),
 
-    # Centered heatmap and bar chart side by side
+    # Heatmap + Légende à droite
     html.Div(
-        style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 'gap': '30px'},
+        style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'flex-start', 'gap': '50px'},
         children=[
             dcc.Graph(
                 id="music-matrix",
                 figure=create_figure(colors),
                 config={'staticPlot': False}
-            )
-            # dcc.Graph(id="bar-chart")
-        ]
-    ),
+            ),
 
-    # Centered legend
-    html.Div([
-        html.Div(style={'display': 'flex', 'alignItems': 'right'}, children=[
-            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': '#90EE90', 'marginRight': '10px'}),
-            html.Span("Caractéristique sélectionnée")
-        ]),
-        html.Div(style={'display': 'flex', 'alignItems': 'right'}, children=[
-            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': 'red', 'marginRight': '10px'}),
-            html.Span("Corrélation négative")
-        ]),
-        html.Div(style={'display': 'flex', 'alignItems': 'right'}, children=[
-            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': 'yellow', 'marginRight': '10px'}),
-            html.Span("Corrélation positive")
-        ])
-    ], style={'display': 'flex', 'justifyContent': 'center', 'gap': '20px', 'marginTop': '20px'})
+            # Légende à droite du graphique
+            html.Div(style={
+                'display': 'flex',
+                'flexDirection': 'column',
+                'gap': '25px',
+                'color': 'black',
+                'marginTop': '150px'  # Décale la légende vers le bas
+            }, children=[
+                html.Div([
+                    html.Strong("Caractéristiques", style={'marginBottom': '20px'}),
+                    html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                        html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#008000'}),
+                        html.Span("Caractéristique importante")
+                    ]),
+                    html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                        html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': 'white'}),
+                        html.Span("Caractéristique pas importante")
+                    ]),
+                    html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                        html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#90EE90'}),
+                        html.Span("Caractéristique sélectionnée")
+                    ])
+                ]),
+
+                html.Div([
+                    html.Strong("Corrélations", style={'marginBottom': '40px'}),
+                    html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                        html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': 'red'}),
+                        html.Span("Corrélation négative")
+                    ]),
+                    html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                        html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': 'yellow'}),
+                        html.Span("Corrélation positive")
+                    ])
+                ])
+            ])
+        ]
+    )
 ])
 
 @app.callback(

@@ -1,7 +1,21 @@
+import dash
 from dash import dcc, html, Input, Output, State
 import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
+
+button_style = {
+    'backgroundColor': '#222',
+    'color': 'white',
+    'border': '1px solid #555',
+    'padding': '10px 20px',
+    'fontSize': '16px',
+    'borderRadius': '8px',
+    'cursor': 'pointer',
+    'transition': '0.3s',
+    'boxShadow': '0 0 5px rgba(255,255,255,0.1)'
+}
+
 
 # Load dataset
 def get_dataframe(path):
@@ -92,66 +106,120 @@ def create_figure(colors):
 
 # Dash layout
 layout = html.Div([
-    html.H2("Corrélations internes au sein de chaque genre", style={'textAlign': 'center'}),
-
     dcc.Store(id="color-store", data=colors.tolist()),
     dcc.Store(id="selected-column", data=None),
 
-    # Centered heatmap and bar chart side by side
-    html.Div(
-        style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 'gap': '30px'},
+    html.Div(  # Conteneur global
+        style={'display': 'flex', 'justifyContent': 'center', 'gap': '10px'},
         children=[
-            dcc.Graph(
-                id="music-matrix",
-                figure=create_figure(colors),
-                config={'staticPlot': False}
+
+            # Légende à gauche
+            html.Div(
+                style={
+                    'display': 'flex',
+                    'flexDirection': 'column',
+                    'gap': '25px',
+                    'color': 'white',
+                    'marginTop': '200px'
+                },
+                children=[
+                    html.Div([
+                        html.Strong("Caractéristique", style={'marginBottom': '20px'}),
+                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#008000'}),
+                            html.Span("Importante")
+                        ]),
+                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': 'white'}),
+                            html.Span("Insignifiante")
+                        ])
+                    ]),
+                    html.Div([
+                        html.Strong("Corrélation après sélection", style={'marginBottom': '40px'}),
+                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#90EE90'}),
+                            html.Span("Caractéristique sélectionnée")
+                        ]),
+                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': 'yellow'}),
+                            html.Span("Corrélation positive")
+                        ]),
+                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': 'red'}),
+                            html.Span("Corrélation négative")
+                        ])
+                    ])
+                ]
+            ),
+
+            # Colonne centrale (boutons + graphique)
+            html.Div([
+                # Boutons centrés au-dessus du graphique
+                html.Div([
+                    html.Button("← Précédent", id="prev-button", n_clicks=0, className='custom-button'),
+                    html.Button("Suivant →", id="next-button", n_clicks=0, className='custom-button')
+                ], style={
+                    'display': 'flex',
+                    'justifyContent': 'center',
+                    'gap': '20px',
+                    'marginBottom': '20px'
+                }),
+
+                # Graphique
+                dcc.Graph(
+                    id="music-matrix",
+                    figure=create_figure(colors),
+                    config={'staticPlot': False}
+                )
+            ]),
+
+            # Analyse à droite
+            html.Div(
+                id="analysis-text",
+                style={
+                    'width': '500px',
+                    'color': 'white',
+                    'fontSize': '16px',
+                    'marginTop': '200px'
+                },
+                children="Les genres pop, latin et R&B partagent des caractéristiques communes, tandis que les autres genres se distinguent davantage par des particularités propres."
             )
-            # dcc.Graph(id="bar-chart")
         ]
-    ),
-
-    # Centered legend
-    html.Div([
-        html.Div(style={'display': 'flex', 'alignItems': 'right'}, children=[
-            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': '#008000', 'marginRight': '10px'}),
-            html.Span("Caractéristique importante")
-        ]),
-
-        html.Div(style={'display': 'flex', 'alignItems': 'right'}, children=[
-            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': '#90EE90', 'marginRight': '10px'}),
-            html.Span("Caractéristique sélectionnée")
-        ]),
-        html.Div(style={'display': 'flex', 'alignItems': 'right'}, children=[
-            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': 'red', 'marginRight': '10px'}),
-            html.Span("Corrélation négative")
-        ]),
-        html.Div(style={'display': 'flex', 'alignItems': 'right'}, children=[
-            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': 'yellow', 'marginRight': '10px'}),
-            html.Span("Corrélation positive")
-        ])
-    ], style={'display': 'flex', 'justifyContent': 'center', 'gap': '20px', 'marginTop': '20px'})
+    )
 ])
+
 
 def register_callbacks(app):
     @app.callback(
         Output("music-matrix", "figure"),
-        #Output("bar-chart", "figure"),
-        Input("music-matrix", "clickData"),
-        State("color-store", "data"),
+        Output("selected-column", "data"),
+        Output("analysis-text", "children"),
+        Input("prev-button", "n_clicks"),
+        Input("next-button", "n_clicks"),
+        State("selected-column", "data"),
+        State("color-store", "data")
     )
-    def update_on_click(clickData, stored_colors):
-        """Changes clicked column to light green, and updates the bar chart."""
-        stored_colors = np.array(stored_colors)  # Convert back to array
+    def navigate_columns(prev_clicks, next_clicks, selected_column, stored_colors):
+        stored_colors = np.array(stored_colors)
 
-        if clickData is None:
-            # return create_figure(stored_colors), go.Figure()  # No click, keep default
-            return create_figure(stored_colors)
-        # Get clicked point index
-        point = clickData["points"][0]
-        x = int(point["x"])  # Only track the column (x-axis)
-        selected_characteristic = x_labels[x]
+        all_columns = [None] + list(range(len(x_labels)))
+        ctx = dash.callback_context
+        button_id = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else None
+        current_index = all_columns.index(selected_column)
 
-        # Make a temporary copy of colors for click effect
+        if button_id == "prev-button":
+            new_index = (current_index - 1) % len(all_columns)
+        elif button_id == "next-button":
+            new_index = (current_index + 1) % len(all_columns)
+        else:
+            new_index = 0
+
+        selected_column = all_columns[new_index]
+
+        if selected_column is None:
+            return create_figure(stored_colors), None, "Les genres pop, latin et R&B partagent des caractéristiques communes, tandis que les autres genres se distinguent davantage par des particularités propres."
+
+        selected_characteristic = x_labels[selected_column]
         temp_colors = stored_colors.copy()
 
         rock_idx = 0
@@ -239,7 +307,6 @@ def register_callbacks(app):
 
         def update_colors(selected_characteristic, temp_colors):
             selected_idx = x_labels.index(selected_characteristic)
-            
             for genre, correlations_dict in correlations.items():
                 for (feature1, feature2), value in correlations_dict.items():
                     if selected_idx in (feature1, feature2):
@@ -247,13 +314,25 @@ def register_callbacks(app):
                         if temp_colors[genre, target_feature] != "white":
                             temp_colors[genre, target_feature] = "red" if value < 0 else "yellow"
 
-        if selected_characteristic in x_labels:
-            update_colors(selected_characteristic, temp_colors)
+        update_colors(selected_characteristic, temp_colors)
 
-        # Change the entire column to light green (except white cases)
         for y in range(y_size):
-            if temp_colors[y, x] != "white":
-                temp_colors[y, x] = "#90EE90"  # Light green
+            if temp_colors[y, selected_column] != "white":
+                temp_colors[y, selected_column] = "#90EE90"
 
-        # return create_figure(temp_colors), fig
-        return create_figure(temp_colors)
+        # Analyses par caractéristique
+        analyses = {
+            "loudness": "Le volume sonore est lié à l'énergie et entraîne moins d'acousticness. Pour la pop, latin et r&b, il transmet la positivité par la valence.",
+            "energy": "",
+            "acousticness": "",
+            "valence": "",
+            "danceability": "",
+            "tempo": "",
+            "instrumentalness": "",
+            "duration_ms": "",
+            "speechiness": "",
+            "liveness": ""
+        }
+        analysis = analyses.get(selected_characteristic, "")
+
+        return create_figure(temp_colors), selected_column, analysis
