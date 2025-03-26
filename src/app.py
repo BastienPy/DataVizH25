@@ -11,6 +11,7 @@ import q1
 import q2
 import q5
 import q8
+import q5
 import q11
 
 # Register callbacks for the sections.
@@ -118,6 +119,13 @@ content = html.Div(
         html.Div(
             q2.layout,
             id="q2-section",
+            style={"padding-top": "60px", "margin-top": "-60px"}
+        ),
+        html.Hr(style={"border-color": "#1DB954"}),
+        # Q5 Section with an id for anchor scrolling
+        html.Div(
+            q5.layout,
+            id="q5-section",
             style={"padding-top": "60px", "margin-top": "-60px"}
         ),
         html.Hr(style={"border-color": "#1DB954"}),

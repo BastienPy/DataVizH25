@@ -1,4 +1,3 @@
-import dash
 from dash import dcc, html, Input, Output, State
 import plotly.graph_objs as go
 import numpy as np
@@ -9,13 +8,13 @@ def get_dataframe(path):
     """Load and preprocess the Spotify dataset."""
     data = pd.read_csv(path)
     data["track_album_release_date"] = pd.to_datetime(data["track_album_release_date"])
-    #data = data.groupby("playlist_genre").apply(lambda x: x.nlargest("track_popularity")).reset_index(drop=True)
-    excluded_artists = [
-        "The Sleep Specialist", "Nature Sounds", "Natural Sound Makers", "Mother Nature Sound FX",
-        "Rain Recordings", "Pinetree Way", "Aquagirl", "Rain Sounds FX", "Relax Meditate Sleep",
-        "Life Sounds Nature"
-    ]
-    data = data[~data["track_artist"].isin(excluded_artists)]
+    # data = data.groupby("playlist_genre").apply(lambda x: x.nlargest("track_popularity")).reset_index(drop=True)
+    # excluded_artists = [
+    #     "The Sleep Specialist", "Nature Sounds", "Natural Sound Makers", "Mother Nature Sound FX",
+    #     "Rain Recordings", "Pinetree Way", "Aquagirl", "Rain Sounds FX", "Relax Meditate Sleep",
+    #     "Life Sounds Nature"
+    # ]
+    # data = data[~data["track_artist"].isin(excluded_artists)]
     data = data[data["track_album_release_date"].dt.year >= 1970]
     return data
 
@@ -57,16 +56,19 @@ def create_figure(colors):
                 'tickmode': 'array',
                 'tickvals': np.arange(x_size),
                 'ticktext': x_labels,
-                'tickangle': -45
+                'tickangle': -45,
+                'color': 'white'  # Set x-axis labels color to white
             },
             'yaxis': {
                 'showgrid': False,
                 'zeroline': False,
                 'tickmode': 'array',
                 'tickvals': np.arange(y_size),
-                'ticktext': y_labels
+                'ticktext': y_labels,
+                'color': 'white'  # Set y-axis labels color to white
             },
-            'plot_bgcolor': 'rgba(0,0,0,0)'
+            'plot_bgcolor': '#121212',  # Set plot background color to black
+            'paper_bgcolor': '#121212'  # Set paper background color to black
         }
     )
 
@@ -90,7 +92,7 @@ def create_figure(colors):
 
 # Dash layout
 layout = html.Div([
-    html.H2("Music Genre vs Audio Features", style={'textAlign': 'center'}),
+    html.H2("Corrélations internes au sein de chaque genre", style={'textAlign': 'center'}),
 
     dcc.Store(id="color-store", data=colors.tolist()),
     dcc.Store(id="selected-column", data=None),
@@ -110,6 +112,11 @@ layout = html.Div([
 
     # Centered legend
     html.Div([
+        html.Div(style={'display': 'flex', 'alignItems': 'right'}, children=[
+            html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': '#008000', 'marginRight': '10px'}),
+            html.Span("Caractéristique importante")
+        ]),
+
         html.Div(style={'display': 'flex', 'alignItems': 'right'}, children=[
             html.Div(style={'width': '20px', 'height': '20px', 'backgroundColor': '#90EE90', 'marginRight': '10px'}),
             html.Span("Caractéristique sélectionnée")

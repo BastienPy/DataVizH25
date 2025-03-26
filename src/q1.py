@@ -135,7 +135,7 @@ def register_callbacks(app):
                 labels={"track_popularity": "Popularité Moyenne", feature: feature.capitalize(), "year": "Année"},
             )
             fig.update_traces(
-                marker=dict(opacity=0.7),
+                marker=dict(opacity=0.95),
                 hovertemplate=(
                     f"{feature.capitalize()}: %{{x:.6f}}<br>"
                     "Popularité Moyenne: %{y:.5f}<br>"
@@ -149,6 +149,16 @@ def register_callbacks(app):
                 title_x=0.5,
                 yaxis_title="Popularité", 
                 xaxis_title=feature.capitalize(),
+                title_font_color='white',
+                xaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+                yaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+                coloraxis_colorbar=dict(
+                tickfont=dict(color='white'),
+                titlefont=dict(color='white')
+                ),
+                # plot_bgcolor = "#1e1e2f",
+                plot_bgcolor='#121212', 
+                paper_bgcolor='#121212',
                 height=350,
                 showlegend=True  
             )
