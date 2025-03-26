@@ -93,8 +93,7 @@ def create_dashboard(df):
                         legendgroup=genre,  # Même groupe pour toutes les traces du même genre
                         showlegend=True if i == 0 else False,  # Afficher la légende seulement pour le premier subplot
                         hovertemplate=f"<b>Genre:</b> {genre}<br><b>Index:</b> %{{y:.2f}}<extra></extra>",
-                        line=dict(width=2)
-                    ),
+                        line=dict(width=2)),
                     row=row,
                     col=col
                 )
@@ -107,17 +106,36 @@ def create_dashboard(df):
                 y=1.02,
                 xanchor="right",
                 x=1,
-                title_text="Genres:"
+                title_text="Genres:",
+                font=dict(color="white")  # Set legend text color to white
+                
             ),
             height=800,
             margin=dict(t=50, b=50),
-            hovermode="x unified"
+            hovermode="x unified",
+            plot_bgcolor='#121212',  # Set plot background color to black
+            paper_bgcolor='#121212',  # Set paper background color to black
+            font=dict(color="white")  # Set all text color to white
         )
         
         # Mise à jour des axes et titres
         for i in range(1, 7):
-            fig.update_yaxes(title_text="Index", row=(i-1)//3 + 1, col=(i-1)%3 + 1)
-            fig.update_xaxes(title_text="Année", row=(i-1)//3 + 1, col=(i-1)%3 + 1)
+            fig.update_yaxes(
+                title_text="Index", 
+                title_font=dict(color="white"),  # Set y-axis title color to white
+                tickfont=dict(color="white"),  # Set y-axis tick color to white
+                showgrid=False,  # Remove y-axis grid lines
+                row=(i-1)//3 + 1, 
+                col=(i-1)%3 + 1
+            )
+            fig.update_xaxes(
+                title_text="Année", 
+                title_font=dict(color="white"),  # Set x-axis title color to white
+                tickfont=dict(color="white"),  # Set x-axis tick color to white
+                showgrid=False,  # Remove x-axis grid lines
+                row=(i-1)//3 + 1, 
+                col=(i-1)%3 + 1
+            )
         
         return html.Div([
             dcc.Graph(
