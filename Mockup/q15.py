@@ -1,8 +1,6 @@
 import pandas as pd
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash import dcc, html, Input, Output
 import plotly.express as px
 
 def convert_date(date):
@@ -16,6 +14,7 @@ def convert_date(date):
         except ValueError:
             return pd.NaT
 
+
 def get_dataframe(path):
     data = pd.read_csv(path)
     data["track_album_release_date"] = data["track_album_release_date"].apply(convert_date)
@@ -24,161 +23,201 @@ def get_dataframe(path):
     return data
 
 def get_color_map():
+    """
+    Récupération de certaines couleurs pour faire correspondre les sous-genres des artistes à ceux du graphe des sou-genres
+    
+    """
     data = get_dataframe("./dataset/spotify_songs_clean.csv")
-    unique_subgenres = sorted(data["playlist_subgenre"].unique())
-    color_sequence = px.colors.qualitative.Dark2
-    #Cycle through the colors if there are more subgenres than colors
-    color_map = {subgenre: color_sequence[i % len(color_sequence)] 
-                 for i, subgenre in enumerate(unique_subgenres)}
+    color_sequence = ['rgb(27,158,119)','rgb(117,112,179)','rgb(102,166,30)','rgb(166,118,29)']
+
+    color_map = {}
+    for genre in sorted(data["playlist_genre"].unique()) :
+        subgenres_genre = data[data["playlist_genre"] == genre]["playlist_subgenre"].unique()
+        color_map.update({subgenre: color_sequence[i % len(color_sequence)] for i, subgenre in enumerate(subgenres_genre)})
     return color_map
 
 color_map = get_color_map()
 
-# Original decade-based preprocessing function
-def data_preprocess(path, filter_type, filter_value=None, genre_filter=None):
+
+def data_preprocess(path, filter_type, artist=None):
+    """
+    Fonction pour preprocess les données
+
+    Args
+    ----
+    path : str
+        Chemin du fichier CSV
+    filter_type : str
+        Type de filtre à appliquer :
+            - "artist" pour filtrer par artiste avec le nom de l'artiste dans l'argument artist
+            - "genre" pour grouper par genres
+            - "edm", "latin", "pop", "r&b", "rap", "rock" pour filtrer par genre (et donc grouper par ses sous-genres)
+    artist : str, optional
+        Nom de l'artiste à filtrer si filter_type est "artist"
+
+    Returns
+    -------
+    pd.DataFrame
+        Données preprocess pour le graph
+    
+    """
     data = get_dataframe(path)
     data["year"] = data["track_album_release_date"].dt.year
     data["decennie"] = (data["year"] // 10) * 10  #Calculate the decade
 
-    if genre_filter:
-        data = data[data["playlist_genre"] == genre_filter]
-
-    if filter_type == "artist" and filter_value:
-        data = data[data["track_artist"] == filter_value]
+    if filter_type == "artist":
+        data = data[data["track_artist"] == artist]
         group_by_column = "playlist_subgenre"
-    elif filter_type in ["genre", "edm", "latin", "pop", "r&b", "rap", "rock"] and filter_value is None:
+    elif filter_type in ["edm", "latin", "pop", "r&b", "rap", "rock"]:
         data = data[data["playlist_genre"] == filter_type]
-        group_by_column = "playlist_subgenre"
-    elif filter_type == "genre" and filter_value:
-        data = data[data["playlist_genre"] == filter_value]
         group_by_column = "playlist_subgenre"
     else:
         group_by_column = "playlist_genre"
 
     genre_data = data.groupby(["decennie", group_by_column]).size().reset_index(name="count")
     genre_data = genre_data.pivot(index="decennie", columns=group_by_column, values="count").fillna(0)
-    total_songs_by_decennie = genre_data.sum(axis=1)
-    genre_data = (genre_data.div(total_songs_by_decennie, axis=0) * 100).reset_index()
+ 
+    genre_data = (genre_data.div(genre_data.sum(axis=1), axis=0) * 100).reset_index()
     genre_data = genre_data.melt(id_vars="decennie", var_name=group_by_column, value_name="percentage")
+
     return genre_data
 
 def data_preprocess_artist_cumulative(path, artist, genre_filter):
+    """
+    Preprocess des données pour les artistes avec les pourcentages cumulatifs par sous-genre
+
+    Args
+    ----
+    path : str
+        Chemin du fichier CSV des données
+    artist : str
+        Nom de l'artiste à filtrer
+    genre_filter : str
+        Genre à filtrer
+
+    Returns
+    -------
+    pd.DataFrame
+        Données preprocess pour le graph
+    """
     data = get_dataframe(path)
-    # Filtrer pour l'artiste et le genre sélectionnés
-    data = data[(data["track_artist"] == artist) & (data["playlist_genre"] == genre_filter)]
-    # Formater la date
+    data = data[(data["track_artist"] == artist) & (data["playlist_genre"] == genre_filter)] # Filtrage pour l'artiste et le genre
     data["formatted_date"] = pd.to_datetime(data["track_album_release_date"]).dt.strftime("%Y-%m-%d")
     
-    # Grouper par date et sous-genre et compter le nombre de chansons
     grouped = data.groupby(["formatted_date", "playlist_subgenre"]).size().reset_index(name="count")
-    # Pivot pour avoir une ligne par date et une colonne par sous-genre
-    pivot = grouped.pivot(index="formatted_date", columns="playlist_subgenre", values="count").fillna(0)
+    pivot = grouped.pivot(index="formatted_date", columns="playlist_subgenre", values="count").fillna(0).sort_index()
     
-    # S'assurer que l'index (date) est de type datetime et trié
-    pivot.index = pd.to_datetime(pivot.index)
-    pivot = pivot.sort_index()
+    cum = pivot.cumsum() # Cumulatif par sous-genre
+    total_cum = cum.sum(axis=1) # Total cumulatif par date
+    cum_percent = cum.div(total_cum, axis=0) * 100 # % cumulatif par sous-genre
     
-    # Calcul de la somme cumulée par sous-genre sur le temps
-    cum = pivot.cumsum()
-    # Pour chaque date, calculer le total cumulé de toutes les chansons
-    total_cum = cum.sum(axis=1)
-    # Calculer le pourcentage cumulatif pour chaque sous-genre
-    cum_percent = cum.div(total_cum, axis=0) * 100
-    
-    # Repasser en format "long" pour Plotly Express
-    cum_percent = cum_percent.reset_index().melt(
-        id_vars="formatted_date", var_name="playlist_subgenre", value_name="percentage"
-    )
-    cum_percent["formatted_date"] = pd.to_datetime(cum_percent["formatted_date"])
-    cum_percent = cum_percent.sort_values("formatted_date")
+    # Repasser en format "long" pour la suite
+    cum_percent = cum_percent.reset_index().melt(id_vars="formatted_date", var_name="playlist_subgenre", value_name="percentage")
+    cum_percent["formatted_date"] = pd.to_datetime(cum_percent["formatted_date"]).sort_values()
     
     return cum_percent
 
 #Custom binning preprocessing function with 10 bins over a dynamic time range
-def data_preprocess_custom(path, filter_type, filter_value=None, genre_filter=None, bins=10, start_date=None, end_date=None):
+def data_preprocess_custom(path,genre_filter, bins=10, start_date=None, end_date=None):
+    """
+    Preprocess des données avec des dates personnalisées et des bins
+
+    Args
+    ----
+    path : str
+        Chemin du fichier CSV des données
+    genre_filter : str
+        Genre à filtrer
+    bins : int
+        Nombre de bins à utiliser
+    start_date : pd.Timestamp
+        Date de début
+    end_date : pd.Timestamp
+        Date de fin
+
+    Returns
+    -------
+    pd.DataFrame
+        Données preprocess pour le graph
+    tuple
+        Dates de début et de fin
+    """
     data = get_dataframe(path)
     
-    #Filter by genre if provided
-    if genre_filter:
-        data = data[data["playlist_genre"] == genre_filter]
-        
-    if filter_type == "artist" and filter_value:
-        data = data[data["track_artist"] == filter_value]
-        group_by_column = "playlist_subgenre"
-    elif filter_type in ["genre", "edm", "latin", "pop", "r&b", "rap", "rock"] and filter_value is None:
-        data = data[data["playlist_genre"] == filter_type]
-        group_by_column = "playlist_subgenre"
-    elif filter_type == "genre" and filter_value:
-        data = data[data["playlist_genre"] == filter_value]
-        group_by_column = "playlist_subgenre"
-    else:
-        group_by_column = "playlist_genre"
+    data = data[data["playlist_genre"] == genre_filter]
     
-    #Define start and end dates based on the data if not provided
-    if start_date is None:
-        min_date = data["track_album_release_date"].min()
-    else:
-        min_date = start_date
-    if end_date is None:
-        max_date = data["track_album_release_date"].max()
-    else:
-        max_date = end_date
+    #Dates de début et de fin
+    min_date = start_date or data["track_album_release_date"].min()
+    max_date = end_date or data["track_album_release_date"].max()
 
-    #If there's only one unique date, extend the range by one day
+    #S'il n'y a qu'une date, on rajoute un jour
     if min_date == max_date:
         max_date = min_date + pd.Timedelta(days=1)
         
-    #Create bin edges and compute midpoints for labeling
+    #Création des bins
     bin_edges = pd.date_range(start=min_date, end=max_date, periods=bins+1)
     bin_midpoints = [bin_edges[i] + (bin_edges[i+1] - bin_edges[i]) / 2 for i in range(len(bin_edges)-1)]
     
-    #Filter data to the chosen time range and assign each song to a bin
+    #Filtrage des données et assignation des chansons aux bins
     data = data[(data["track_album_release_date"] >= min_date) & (data["track_album_release_date"] <= max_date)]
     data["time_bin"] = pd.cut(data["track_album_release_date"], bins=bin_edges, labels=bin_midpoints, include_lowest=True)
     
-    #Group by the custom time_bin and the specified grouping column, then calculate percentages
-    genre_data = data.groupby(["time_bin", group_by_column]).size().reset_index(name="count")
-    genre_data = genre_data.pivot(index="time_bin", columns=group_by_column, values="count").fillna(0)
-    total_songs_by_bin = genre_data.sum(axis=1)
-    genre_data = (genre_data.div(total_songs_by_bin, axis=0) * 100).reset_index()
-    genre_data = genre_data.melt(id_vars="time_bin", var_name=group_by_column, value_name="percentage")
+    #Calcul des pourcentages
+    genre_data = data.groupby(["time_bin", "playlist_subgenre"]).size().reset_index(name="count")
+    genre_data = genre_data.pivot(index="time_bin", columns="playlist_subgenre", values="count").fillna(0)
+    genre_data = (genre_data.div(genre_data.sum(axis=1), axis=0) * 100).reset_index()
+    genre_data = genre_data.melt(id_vars="time_bin", var_name="playlist_subgenre", value_name="percentage")
     
     return genre_data, (min_date, max_date)
 
-#Cached figures for decade-based graphs (used when no artist is selected)
+
+def get_figure_genre():
+    genre_data = data_preprocess("./dataset/spotify_songs_clean.csv", "playlist_genre", "playlist_genre")
+    fig = px.area(genre_data, x="decennie", y="percentage", color="playlist_genre", line_group="playlist_genre", hover_data=["playlist_genre"],
+                  color_discrete_sequence=px.colors.qualitative.Dark2)
+
+    fig.update_layout(height=500)
+    fig.update_traces(hovertemplate=get_hover_template("Genre"))
+    fig.update_yaxes(title_text='Pourcentage (%)')
+    fig.update_layout(legend_title_text="Genre")
+
+    return fig
+
+
+#Figures en cache pour les sous-genres
 subgenre_cache = {
     "edm": px.area(
-        data_preprocess("./dataset/spotify_songs_clean.csv", "genre", "edm"),
+        data_preprocess("./dataset/spotify_songs_clean.csv", "edm"),
         x="decennie", y="percentage", color="playlist_subgenre",
         line_group="playlist_subgenre", hover_data=["playlist_subgenre"],
         color_discrete_map=color_map
     ),
     "latin": px.area(
-        data_preprocess("./dataset/spotify_songs_clean.csv", "genre", "latin"),
+        data_preprocess("./dataset/spotify_songs_clean.csv", "latin"),
         x="decennie", y="percentage", color="playlist_subgenre",
         line_group="playlist_subgenre", hover_data=["playlist_subgenre"],
         color_discrete_map=color_map
     ),
     "pop": px.area(
-        data_preprocess("./dataset/spotify_songs_clean.csv", "genre", "pop"),
+        data_preprocess("./dataset/spotify_songs_clean.csv", "pop"),
         x="decennie", y="percentage", color="playlist_subgenre",
         line_group="playlist_subgenre", hover_data=["playlist_subgenre"],
         color_discrete_map=color_map
     ),
     "r&b": px.area(
-        data_preprocess("./dataset/spotify_songs_clean.csv", "genre", "r&b"),
+        data_preprocess("./dataset/spotify_songs_clean.csv", "r&b"),
         x="decennie", y="percentage", color="playlist_subgenre",
         line_group="playlist_subgenre", hover_data=["playlist_subgenre"],
         color_discrete_map=color_map
     ),
     "rap": px.area(
-        data_preprocess("./dataset/spotify_songs_clean.csv", "genre", "rap"),
+        data_preprocess("./dataset/spotify_songs_clean.csv", "rap"),
         x="decennie", y="percentage", color="playlist_subgenre",
         line_group="playlist_subgenre", hover_data=["playlist_subgenre"],
         color_discrete_map=color_map
     ),
     "rock": px.area(
-        data_preprocess("./dataset/spotify_songs_clean.csv", "genre", "rock"),
+        data_preprocess("./dataset/spotify_songs_clean.csv", "rock"),
         x="decennie", y="percentage", color="playlist_subgenre",
         line_group="playlist_subgenre", hover_data=["playlist_subgenre"],
         color_discrete_map=color_map
@@ -197,7 +236,7 @@ def get_hover_template(type_name):
     )
 
 
-#Hover template for the custom binned graphs with formatted dates
+#Hover template pour les graphes avec les custom bins
 def get_hover_template_custom(type_name):
     return (
         f"<b>{type_name}:</b></span>" 
@@ -215,9 +254,20 @@ app = dash.Dash(__name__)
 app.layout = html.Div([
     html.H4("Évolution de la proportion des sous-genres musicaux par genre et artiste",
             style={"fontWeight": "bold", "fontSize": "30px", "textAlign": "center"}),
-    
+
+    # Graphe des genres
     html.Div([
-        # Left column: Genre selection and graph
+        html.H4("Évolution de la proportion des genres", style={"fontWeight": "bold", "fontSize": "20px", "textAlign": "center"}),
+        dcc.Graph(id="graph-q8", figure=get_figure_genre(), style={"margin": "0 auto", "width": "80%"})
+    ], style={"textAlign": "center"}),
+
+    # TODO : à compléter
+    html.Div([
+        html.H4("Truc à dire", style={"textAlign": "center", "margin": "20px 0"})
+    ]),
+
+    # Graphes des sous-genres et artistes
+    html.Div([
         html.Div([
             html.Label("Sélectionnez un genre:"),
             dcc.Dropdown(
@@ -229,12 +279,10 @@ app.layout = html.Div([
             dcc.Graph(id='subgenre_graph')
         ], style={"width": "50%", "display": "inline-block", "verticalAlign": "top", "padding": "10px"}),
 
-        # Right column: Artist selection and graph
         html.Div([
             html.Label("Sélectionnez un artiste:"),
             dcc.Dropdown(
                 id='artist_dropdown',
-                options=[],  # Options will be populated based on selected genre
                 placeholder="Sélectionnez un artiste",
                 style={"margin-bottom": "20px"}
             ),
@@ -253,15 +301,10 @@ def update_artist_options(selected_genre):
     if not selected_genre:
         return [], None
     data = get_dataframe("./dataset/spotify_songs_clean.csv")
-    # Filter data to only include songs from the selected genre
-    data = data[data["playlist_genre"] == selected_genre]
-    # Count unique songs per artist (assuming the CSV contains a 'track_name' column)
+    data = data[data["playlist_genre"] == selected_genre] # Filtrage par genre des chansons
     artist_counts = data.groupby("track_artist")["track_name"].nunique().reset_index(name="song_count")
-    # Sort artists by the number of unique songs in descending order
     artist_counts = artist_counts.sort_values("song_count", ascending=False)
-    # Create the dropdown options list using the sorted order
-    options = [{'label': artist, 'value': artist} for artist in artist_counts["track_artist"]]
-    # Reset the selected artist value to None
+    options = [{'label': artist, 'value': artist} for artist in artist_counts["track_artist"]] # Création des options pour le dropdown
     return options, None
 
 
@@ -279,27 +322,22 @@ def update_subgenre_graph(selected_genre, selected_artist):
                            showarrow=False)
         return fig
 
-    if selected_artist:
-        # Determine the artist's time range within the selected genre
+    if selected_artist: # Mise à jour du graphe avec les ranges de l'artiste
         data = get_dataframe("./dataset/spotify_songs_clean.csv")
-        data_artist = data[(data["playlist_genre"] == selected_genre) &
-                           (data["track_artist"] == selected_artist)]
+        data_artist = data[(data["playlist_genre"] == selected_genre) &(data["track_artist"] == selected_artist)]
+        
         if data_artist.empty:
-            # Fallback to cached genre figure if no artist data found
             fig = subgenre_cache[selected_genre]
         else:
             artist_min = data_artist["track_album_release_date"].min()
             artist_max = data_artist["track_album_release_date"].max()
-            # Use custom binning with 10 bins over the artist's timeframe
             genre_data, _ = data_preprocess_custom(
                 "./dataset/spotify_songs_clean.csv", 
-                "genre", 
                 selected_genre, 
                 bins=10, 
                 start_date=artist_min, 
                 end_date=artist_max
             )
-            # Convert time_bin values to datetime so that Plotly formats them correctly
             genre_data["time_bin"] = pd.to_datetime(genre_data["time_bin"])
             fig = px.area(
                 genre_data, 
@@ -309,45 +347,17 @@ def update_subgenre_graph(selected_genre, selected_artist):
                 hover_data=["playlist_subgenre"],
                 color_discrete_map=color_map
             )
-            # Use the custom hover template for the custom binned data
+
             fig.update_traces(hovertemplate=get_hover_template_custom(selected_genre))
             fig.update_layout(legend_title_text="Sous-genre de " + selected_genre)
             fig.update_layout(legend=dict(traceorder='reversed'))
-            # Update x-axis to show formatted dates instead of numeric timestamps
             fig.update_xaxes(title_text="Date", tickformat="%Y")
     else:
-        # When only a genre is selected, use the cached (decade-based) figure
         fig = subgenre_cache[selected_genre]
         
     fig.update_yaxes(title_text='Pourcentage (%)')
     return fig
 
-
-def data_preprocess_artist(path, artist, genre_filter):
-    data = get_dataframe(path)
-    # Filter for the selected artist and genre
-    data = data[(data["track_artist"] == artist) & (data["playlist_genre"] == genre_filter)]
-    # Create a formatted date column (or simply use the original date)
-    data["formatted_date"] = data["track_album_release_date"].dt.strftime("%Y-%m-%d")
-    
-    # Group by the formatted date and subgenre, and count the number of songs
-    grouped = data.groupby(["formatted_date", "playlist_subgenre"]).size().reset_index(name="count")
-    
-    # Pivot the table to have one row per date and one column per subgenre
-    pivot = grouped.pivot(index="formatted_date", columns="playlist_subgenre", values="count").fillna(0)
-    
-    # Calculate percentages per date
-    pivot_percent = pivot.div(pivot.sum(axis=1), axis=0) * 100
-    pivot_percent = pivot_percent.reset_index()
-    
-    # Melt back to tidy format for Plotly Express
-    melted = pivot_percent.melt(id_vars="formatted_date", var_name="playlist_subgenre", value_name="percentage")
-    
-    # Ensure dates are sorted correctly (convert back to datetime if needed)
-    melted["formatted_date"] = pd.to_datetime(melted["formatted_date"])
-    melted = melted.sort_values("formatted_date")
-    
-    return melted
 
 @app.callback(
     Output('artist_subgenre_graph', 'figure'),
@@ -362,16 +372,15 @@ def update_artist_subgenre_graph(selected_genre, selected_artist):
                            showarrow=False)
         return fig
 
-    # Utiliser la nouvelle fonction qui calcule les proportions cumulées
+    # Proportions cumulées des sous-genres pour l'artiste
     artist_data = data_preprocess_artist_cumulative("./dataset/spotify_songs_clean.csv", selected_artist, selected_genre)
     
-    # Création du graphique en aires avec les dates formatées
+    # Création du graphique
     fig = px.area(artist_data, x="formatted_date", y="percentage", color="playlist_subgenre",
                   line_group="playlist_subgenre", hover_data=["playlist_subgenre"],
                   color_discrete_map=color_map)
     
     fig.update_layout(height=500, title=f"Évolution cumulée des sous-genres pour {selected_artist} ({selected_genre})")
-    # Personnalisation du hover pour afficher la date au format souhaité
     fig.update_traces(hovertemplate=(
         "<b>Sous-genre:</b> %{customdata[0]}<br>"
         "<b>Date:</b> %{x|%Y-%m-%d}<br>"
