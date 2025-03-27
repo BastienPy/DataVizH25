@@ -18,13 +18,12 @@ import q11
 q1.register_callbacks(app)
 q2.register_callbacks(app)
 q5.register_callbacks(app)
-q8.register_callbacks(app)  # Uncomment if needed
-q11.register_callbacks(app) # Uncomment if needed
+q8.register_callbacks(app) 
 
 # Top navigation bar with anchor links for scrolling.
 navbar = html.Div(
     [
-        html.Img(src="/assets/spotify_icon.png", style={'height': '40px', 'marginRight': '10px'}),
+        html.Img(src="/assets/spotify_icon.svg", style={'height': '40px', 'marginRight': '10px'}),
         html.A(
             [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q1 Analysis"],
             href="#q1-section"
@@ -51,13 +50,13 @@ navbar = html.Div(
 
 # Mascot element – the image that can be clicked to hide it.
 mascot = html.Div(
-    html.Img(src="/assets/mascot.svg", style={'height': '150px'}),
+    html.Img(src="/assets/mascot.png", style={'height': '150px'}),
     id='mascot',
     n_clicks=0,  # for toggling
     style={
         'position': 'fixed',
         'bottom': '20px',
-        'left': '20px',
+        'left': '0px',
         'zIndex': '1001',
         'display': 'block'
     }
@@ -71,7 +70,7 @@ mascot_toggle_btn = html.Button(
     style={
         'position': 'fixed',
         'bottom': '20px',
-        'left': '20px',
+        'left': '0px',
         'zIndex': '1002',
         'display': 'none',
         'backgroundColor': '#1DB954',
@@ -89,7 +88,7 @@ mascot_speech = html.Div(
     style={
         'position': 'fixed',
         'bottom': '180px',
-        'left': '20px',
+        'left': '0px',
         'backgroundColor': '#1DB954',
         'padding': '10px',
         'borderRadius': '10px'
@@ -199,13 +198,13 @@ def update_mascot_styles(is_visible):
     base_mascot_style = {
         'position': 'fixed',
         'bottom': '20px',
-        'left': '20px',
+        'left': '0px',
         'zIndex': '1001'
     }
     base_toggle_style = {
         'position': 'fixed',
         'bottom': '20px',
-        'left': '20px',
+        'left': '0px',
         'zIndex': '1002',
         'backgroundColor': '#1DB954',
         'border': 'none',
