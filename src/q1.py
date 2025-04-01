@@ -153,9 +153,10 @@ def register_callbacks(app):
                 xaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
                 yaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
                 coloraxis_colorbar=dict(
-                tickfont=dict(color='white'),
-                titlefont=dict(color='white')
-                ),
+                    tickfont=dict(color='white'),
+                    title=dict(font=dict(color='white'))
+                )
+                ,
                 # plot_bgcolor = "#1e1e2f",
                 plot_bgcolor='#121212', 
                 paper_bgcolor='#121212',
