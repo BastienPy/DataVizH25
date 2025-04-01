@@ -81,6 +81,33 @@ layout = html.Div([
         marks={str(year): str(year) for year in range(grouped_df["year"].min(), grouped_df["year"].max()+1, 10)},
         step=10
     ),
+
+                # Boutons centrés au-dessus du graphique
+                html.Div([
+                    html.Button("← Précédent", id="prev-button-q1", n_clicks=0, className='custom-button'),
+                    html.Button("Suivant →", id="next-button-q1", n_clicks=0, className='custom-button')
+                ], style={
+                    'display': 'flex',
+                    'justifyContent': 'center',
+                    'gap': '20px',
+                    'marginTop': '20px',
+                    'marginBottom': '20px'
+                }),
+                            # Analyse à droite
+            html.Div(
+                id="analysis-text-q1",
+                style={
+                    # 'width': '800px',
+                    'color': 'white',
+                    'fontSize': '16px',
+                    'marginTop': '20px',
+                    'textAlign': 'center'
+                },
+                children="Pour certaines caractéristiques audio on remarque une très faible corrélation entre leur variations et celles de la popularité indiquant un rôle faible dans la popularité de la musique."
+            ),
+                
+                
+
     html.Div(id="charts-container", style={"display": "grid", "grid-template-columns": "repeat(3, 1fr)", "gap": "20px"})
 ])
 
