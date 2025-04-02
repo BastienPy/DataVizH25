@@ -75,7 +75,6 @@ def get_figure_genre():
     fig.update_yaxes(title_text='Pourcentage (%)')
     fig.update_layout(legend_title_text="Genre")
 
-
     return fig
 
 layout = html.Div([

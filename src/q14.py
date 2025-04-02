@@ -176,10 +176,18 @@ def get_figure_genre():
     fig = px.area(genre_data, x="decennie", y="percentage", color="playlist_genre", line_group="playlist_genre", hover_data=["playlist_genre"],
                   color_discrete_sequence=px.colors.qualitative.Dark2)
 
-    fig.update_layout(height=500)
+    fig.update_layout(
+                height=500,
+                legend_title_text="Genre",
+                title_font=dict(color='white'),
+                plot_bgcolor='#121212', 
+                paper_bgcolor='#121212',
+                legend=dict(font=dict(color='white')),
+                xaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white')),
+                yaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white')),
+                )
     fig.update_traces(hovertemplate=get_hover_template("Genre"))
-    fig.update_yaxes(title_text='Pourcentage (%)')
-    fig.update_layout(legend_title_text="Genre")
+    fig.update_yaxes(title_text='Pourcentage (%)', title_font=dict(color='white'), tickfont=dict(color='white'))
 
     return fig
 
@@ -191,7 +199,8 @@ subgenre_cache = {
         x="decennie", y="percentage", color="playlist_subgenre",
         line_group="playlist_subgenre", hover_data=["playlist_subgenre"],
         color_discrete_map=color_map,
-        title="Évolution des sous-genres de Edm"
+        title="Évolution des sous-genres de Edm",
+        height=500,
     ),
     "latin": px.area(
         data_preprocess("./dataset/spotify_songs_clean.csv", "latin"),
@@ -334,6 +343,14 @@ def register_callbacks(app):
             fig.add_annotation(dict(xref="paper", yref="paper", x=0.5, y=0.5),
                             text="Sélectionnez un genre pour voir les données.",
                             showarrow=False)
+            fig.update_layout(height=500,
+                title_font=dict(color='white'),
+                legend=dict(traceorder='reversed',font=dict(color='white')),
+                legend_title=dict(font=dict(color='white')),
+                paper_bgcolor='#121212',
+                xaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white')),
+                yaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white'))
+            )
             return fig
 
         if selected_artist: # Mise à jour du graphe avec les ranges de l'artiste
@@ -342,6 +359,15 @@ def register_callbacks(app):
             
             if data_artist.empty:
                 fig = subgenre_cache[selected_genre]
+                fig.update_layout(
+                    title_font=dict(color='white'),
+                    legend_title=dict(font=dict(color='white')),
+                    legend=dict(traceorder='reversed', font=dict(color='white')),
+                    plot_bgcolor='#121212', 
+                    paper_bgcolor='#121212',
+                    xaxis=dict(showgrid=True, title_font=dict(color='white'), tickfont=dict(color='white')),
+                    yaxis=dict(showgrid=True, title_font=dict(color='white'), tickfont=dict(color='white'))
+                )
             else:
                 artist_min = data_artist["track_album_release_date"].min()
                 artist_max = data_artist["track_album_release_date"].max()
@@ -363,13 +389,32 @@ def register_callbacks(app):
                 )
 
                 fig.update_traces(hovertemplate=get_hover_template_custom(selected_genre))
-                fig.update_layout(height=500, title=f"Évolution des sous-genres de {selected_genre}")
-                fig.update_layout(legend_title_text="Sous-genre de " + selected_genre)
-                fig.update_layout(legend=dict(traceorder='reversed'))
+                fig.update_layout(
+                    title_font=dict(color='white'),
+                    height=500, 
+                    title=dict(text=f"Évolution des sous-genres de {selected_genre}", font=dict(color='white')),
+                    legend_title_text="Sous-genre de " + selected_genre,
+                    legend_title=dict(font=dict(color='white')),
+                    legend=dict(traceorder='reversed',font=dict(color='white')),
+                    plot_bgcolor='#121212', 
+                    paper_bgcolor='#121212',
+                    xaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white')),
+                    yaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white'))
+                    )
+
+
                 fig.update_xaxes(title_text="Date", tickformat="%Y")
         else:
             fig = subgenre_cache[selected_genre]
-            
+            fig.update_layout(
+                    title_font=dict(color='white'),
+                    legend_title=dict(font=dict(color='white')),
+                    legend=dict(traceorder='reversed', font=dict(color='white')),
+                    plot_bgcolor='#121212', 
+                    paper_bgcolor='#121212',
+                    xaxis=dict(showgrid=True, title_font=dict(color='white'), tickfont=dict(color='white')),
+                    yaxis=dict(showgrid=True, title_font=dict(color='white'), tickfont=dict(color='white'))
+                )
         fig.update_yaxes(title_text='Pourcentage (%)')
         return fig
 
@@ -385,6 +430,14 @@ def register_callbacks(app):
             fig.add_annotation(dict(xref="paper", yref="paper", x=0.5, y=0.5),
                             text="Sélectionnez un artiste pour voir les données.",
                             showarrow=False)
+            fig.update_layout(height=500,
+                title_font=dict(color='white'),
+                legend=dict(traceorder='reversed',font=dict(color='white')),
+                legend_title=dict(font=dict(color='white')),
+                paper_bgcolor='#121212',
+                xaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white')),
+                yaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white'))
+            )
             return fig
 
         # Proportions cumulées des sous-genres pour l'artiste
@@ -395,13 +448,23 @@ def register_callbacks(app):
                     line_group="playlist_subgenre", hover_data=["playlist_subgenre"],
                     color_discrete_map=color_map)
         
-        fig.update_layout(height=500, title=f"Évolution cumulée des sous-genres pour {selected_artist} ({selected_genre})")
         fig.update_traces(hovertemplate=(
             "<b>Sous-genre:</b> %{customdata[0]}<br>"
             "<b>Date:</b> %{x|%Y-%m-%d}<br>"
             "<b>Pourcentage cumulatif:</b> %{y:.3f}%<extra></extra>"
         ))
         fig.update_yaxes(title_text='Pourcentage cumulatif (%)')
-        fig.update_layout(legend_title_text="Sous-genre", legend=dict(traceorder='reversed'))
+
+        fig.update_layout(height=500,
+                title=f"Évolution cumulée des sous-genres pour {selected_artist} ({selected_genre})",
+                title_font=dict(color='white'),
+                legend_title_text="Sous-genre",
+                legend=dict(traceorder='reversed',font=dict(color='white')),
+                legend_title=dict(font=dict(color='white')),
+                plot_bgcolor='#121212', 
+                paper_bgcolor='#121212',
+                xaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white')),
+                yaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white'))
+                )
         
         return fig
