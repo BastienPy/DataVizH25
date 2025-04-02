@@ -126,7 +126,7 @@ narrative = html.Div(
 content = html.Div(
     [
         # Q1 Section with an id for anchor scrolling.
-        narrative,
+        narrative_q1,
         html.Hr(style={"border-color": "#1DB954"}),
         html.Div(
             q1.layout,
