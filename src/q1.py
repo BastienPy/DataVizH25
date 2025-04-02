@@ -150,7 +150,7 @@ def register_callbacks(app):
         features = carac_audio.copy()
 
         if page == 1:
-            text = "Pour certaines caractéristiques audio on remarque une très faible corrélation entre leur variations et celles de la popularité indiquant un rôle faible dans la popularité de la musique."
+            text = "Pour les caractéristiques audio on remarque une très faible corrélation entre leur variations et celles de la popularité indiquant un rôle faible dans la popularité de la musique."
         elif page == 2:
             text = "Même pour un genre spécifique, on n’observe pas un impact important des caractéristique audio sur la popularité d’une musique. Vous pouvez aussi explorer les données pour un genre de votre choix en utilisant le filtre par genre."
             genre = "pop"
@@ -180,7 +180,9 @@ def register_callbacks(app):
     def update_charts(year_range, selected_genre, features):
         filtered_df = filter_df(year_range, selected_genre)
         charts = []
+        total_features = len(features)
         for i, feature in enumerate(features):
+            # getting index of last subchart in row
             show_colorbar = ((i + 1) % 3 == 0) or (i == len(carac_audio) - 1)
             fig = px.scatter(
                 filtered_df.copy(),
@@ -218,9 +220,15 @@ def register_callbacks(app):
                 height=350,
                 showlegend=True  
                 )
+            # centering last row
+            remaining = total_features % 3
+            is_last = i == total_features - 1
+            needs_centering = remaining == 1 and is_last
+            style = {"width": "100%", "textAlign": "center"}
+            if needs_centering:
+                style["gridColumn"] = "2 / 3"  # center in the second column of 3
+            charts.append(html.Div(dcc.Graph(figure=fig), style=style))
             
-            
-            charts.append(html.Div(dcc.Graph(figure=fig), style={"textAlign": "center"}))
         return charts
 
 
