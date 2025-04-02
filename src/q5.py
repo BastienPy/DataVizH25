@@ -11,10 +11,10 @@ def load_and_clean_data(filepath="./dataset/spotify_songs_clean.csv"):
     return df
 
 def preprocess_dates(df):
-    df["track_album_release_date"] = pd.to_datetime(df["track_album_release_date"], errors='coerce')
-    df = df[df["track_album_release_date"].notna() & (df["track_album_release_date"].dt.month.notna())]
+    df["track_album_release_date"] = pd.to_datetime(df["track_album_release_date"], errors='coerce') #conversion en datetime
+    df = df[df["track_album_release_date"].notna() & (df["track_album_release_date"].dt.month.notna())] 
     df["year_month"] = df["track_album_release_date"].dt.to_period('M')
-    df = df[df["year_month"] > '2000-01']
+    df = df[df["year_month"] > '2000-01'] #filtre pour ne garder que les dates après 2000
     df["year_month"] = df["year_month"].astype(str)
     return df
 
@@ -36,7 +36,9 @@ def calculate_index(df_popular, base_year=1998):
     for feature in features:
         for genre in df_popular["playlist_genre"].unique():
             base_value = base_values[base_values["playlist_genre"] == genre][feature].values[0]
-            df_popular.loc[(df_popular["playlist_genre"] == genre), f"{feature}_index"] = ((df_popular[feature] - base_value) / base_value * 100)  
+            df_popular.loc[(df_popular["playlist_genre"] == genre), f"{feature}_index"] = (
+                (df_popular[feature] / base_value) * 100
+            )  # Start at 100% instead of 0%
     return df_popular
 
 # data
