@@ -3,6 +3,8 @@ from dash import dcc, html, Input, Output
 import plotly.express as px
 from dash import State
 from dash import callback_context as ctx
+from dash import ctx, no_update
+
 
 
 # Path to dataset and audio features list.
@@ -43,14 +45,11 @@ grouped_df,grouped_df_genre = preprocess_data()
 
 def filter_df(year_range, genre):
     start_year, end_year = year_range
-    if genre == 'all':
+    if genre == "all":
         return grouped_df[(grouped_df["year"] >= start_year) & (grouped_df["year"] <= end_year)]
     else:
-        return grouped_df_genre[
-            (grouped_df_genre["year"] >= start_year) &
-            (grouped_df_genre["year"] <= end_year) &
-            (grouped_df_genre["playlist_genre"] == genre)
-        ]
+        filtered = grouped_df_genre[(grouped_df_genre["playlist_genre"] == genre)]
+        return filtered[(filtered["year"] >= start_year) & (filtered["year"] <= end_year)]
 
 # Export the layout as a variable.
 layout = html.Div([
@@ -132,9 +131,8 @@ def register_callbacks(app):
         elif triggered == "prev-button-q1":
             return 7 if current == 1 else current - 1
         return current
-    
+
     @app.callback(
-        Output("charts-container", "children"),
         Output("analysis-text-q1", "children"),
         Output("year-slider", "value"),
         Output("genre-dropdown", "value"),
@@ -143,14 +141,14 @@ def register_callbacks(app):
     )
     def display_story(page):
         text = ""
-        genre = 'all'
+        genre = "all"
         year_range = [1970, 2020]
         features = carac_audio.copy()
 
         if page == 1:
             text = "Pour certaines caractéristiques audio on remarque une très faible corrélation entre leur variations et celles de la popularité indiquant un rôle faible dans la popularité de la musique."
         elif page == 2:
-            text = "Même pour un genre spécifique, on n’observe pas un impact important des caractéristique audio sur la popularité d’une musique. \nVous pouvez aussi explorer les données pour un genre de votre choix en utilisant le filtre par genre."
+            text = "Même pour un genre spécifique, on n’observe pas un impact important des caractéristique audio sur la popularité d’une musique. Vous pouvez aussi explorer les données pour un genre de votre choix en utilisant le filtre par genre."
             genre = "pop"
         elif page == 3:
             text = "Les musiques anciennes présentent un mode, valence et loudness faible."
@@ -162,19 +160,26 @@ def register_callbacks(app):
             text = "Nous pouvons ainsi conclure que les musiques récentes ont certaines caractéristiques audio différentes."
         elif page == 6:
             text = "Les caractéristiques exceptées key et liveness présentent des tendances et des évolutions notables au fil du temps"
-            features = [f for f in carac_audio if f not in ["key", "liveness"]]
         elif page == 7:
             text = "Alors que les caractéristiques Key et Liveness reste relativement stable au fil du temps et donc intemporelles"
 
-        filtered = filter_df(year_range, genre)
+        return text, year_range, genre, f"{page}/7"
+
+    @app.callback(
+        Output("charts-container", "children"),
+        Input("year-slider", "value"),
+        Input("genre-dropdown", "value")
+    )
+    def update_charts(year_range, selected_genre):
+        filtered_df = filter_df(year_range, selected_genre)
         charts = []
-        for i, feature in enumerate(features):
-            show_colorbar = ((i + 1) % 3 == 0) or (i == len(features) - 1)
+        for i, feature in enumerate(carac_audio):
+            show_colorbar = ((i + 1) % 3 == 0) or (i == len(carac_audio) - 1)
             fig = px.scatter(
-                filtered.copy(),
+                filtered_df.copy(),
                 x=feature,
                 y="track_popularity",
-                size=[20]*len(filtered),
+                size=[20]*len(filtered_df),
                 color="year",
                 color_continuous_scale="Viridis",
                 labels={"track_popularity": "Popularité Moyenne", feature: feature.capitalize(), "year": "Année"},
@@ -184,8 +189,12 @@ def register_callbacks(app):
                 fig.update_coloraxes(showscale=False)
             fig.update_layout(title_x=0.5, height=350)
             charts.append(html.Div(dcc.Graph(figure=fig), style={"textAlign": "center"}))
+        return charts
 
-        return charts, text, year_range, genre, f"{page}/7"
 
-    
+
+
+
+
+        
 
