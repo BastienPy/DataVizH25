@@ -52,17 +52,20 @@ def get_figure():
     fig.update_traces(hovertemplate=get_hover_template())
 
     fig.update_layout(
-        title=dict(text="<b>Popularité moyenne des artistes en fonction du nombre de sous-genres<b>", font=dict(size=20)),
-        xaxis_title="Nombre de sous-genres", xaxis=dict(showgrid=True),
-        yaxis_title="Popularité moyenne", yaxis=dict(showgrid=True),
+        title=dict(text="<b>Popularité moyenne des artistes en fonction du nombre de sous-genres<b>", font=dict(size=20,color='white')),
+        xaxis_title="Nombre de sous-genres",
+        yaxis_title="Popularité moyenne",
+        xaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white')),
+        yaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white')),
         showlegend=True,
         legend_title_text="Légende",
-        plot_bgcolor='#f5f6f7',
+        legend=dict(font=dict(color='white')),
+        legend_title=dict(font=dict(color='white')),
+        plot_bgcolor='#121212', 
+        paper_bgcolor='#121212',
         height=600,
     )
     return fig
-
-
 
 # app = dash.Dash(__name__)
 

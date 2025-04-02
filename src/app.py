@@ -7,25 +7,30 @@ app = dash.Dash(__name__, suppress_callback_exceptions=True)
 app.title = 'Spotify Songs Analysis'
 
 # Import your sections (q1, q2, q8, q11 must export a "layout" variable)
+import caracteristiques_audio
 import q1
 import q2
 import q5
-import q8
-import q5
 import q11
+import q14
 import q13
 
 # Register callbacks for the sections.
+caracteristiques_audio.register_callbacks(app)
 q1.register_callbacks(app)
 q2.register_callbacks(app)
 q5.register_callbacks(app)
-q8.register_callbacks(app) 
+q14.register_callbacks(app)
 q13.register_callbacks(app)
 
 # Top navigation bar with anchor links for scrolling.
 navbar = html.Div(
     [
         html.Img(src="/assets/spotify_icon.svg", style={'height': '40px', 'marginRight': '10px'}),
+        html.A(
+            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Définitions"],
+            href="#def-section"
+        ),
         html.A(
             [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q1 Analysis"],
             href="#q1-section"
@@ -39,17 +44,17 @@ navbar = html.Div(
             href="#q5-section"
         ),
         html.A(
-            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q8 Analysis"],
-            href="#q8-section"
-        ),
-        html.A(
             [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q11 Analysis"],
             href="#q11-section"
         ),
         html.A(
+            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q14 Analysis"],
+            href="#q14-section"
+        ),
+        html.A(
             [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q13 Analysis"],
             href="#q13-section"
-        ),
+        )
     ],
     className="navbar"
 )
@@ -121,8 +126,13 @@ narrative = html.Div(
 content = html.Div(
     [
         # Q1 Section with an id for anchor scrolling.
-        narrative,
+        narrative_q1,
         html.Hr(style={"border-color": "#1DB954"}),
+        html.Div(
+            caracteristiques_audio.layout,
+            id="def-section",
+            style={"padding-top": "60px", "margin-top": "-60px"}
+        ),
         html.Div(
             q1.layout,
             id="q1-section",
@@ -144,17 +154,17 @@ content = html.Div(
             style={"padding-top": "60px", "margin-top": "-60px"}
         ),
         html.Hr(style={"border-color": "#1DB954"}),
-        # Q8 Section with an id for anchor scrolling.
-        html.Div(
-            q8.layout,
-            id="q8-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
-        ),
-        html.Hr(style={"border-color": "#1DB954"}),
         # Q11 Section with an id for anchor scrolling.
         html.Div(
             q11.layout,
             id="q11-section",
+            style={"padding-top": "60px", "margin-top": "-60px"}
+        ),
+        html.Hr(style={"border-color": "#1DB954"}),
+        # Q14 Section with an id for anchor scrolling.
+        html.Div(
+            q14.layout,
+            id="q14-section",
             style={"padding-top": "60px", "margin-top": "-60px"}
         ),
         html.Div(
@@ -280,16 +290,20 @@ app.clientside_callback(
     Input('current-section', 'data')
 )
 def update_speech(current):
-    if current == "q1-section":
-        return "Exploring Q1 insights!"
+    if current == "def-section":
+        return "Définissions les termes"
+    elif current == "q1-section":
+        return "Comment évoluent les caractéristiques audio, et quel impact sur la popularité ?"
     elif current == "q2-section":
-        return "Dive into Q2 details!"
-    elif current == "q8-section":
-        return "Uncovering Q8 trends!"
+        return "Quelles corrélations entre les caractéristiques audio ?"
+    elif current == "q5-section":
+        return "Comment évoluent les caractéristiques audio selon le genre ?"
     elif current == "q11-section":
-        return "Q11 findings are here!"
-    elif current == "q11-section":
-        return "Wrapping up with Q13 findings!"
+        return "Les artistes diversifiés sont-ils plus populaires ?"
+    elif current == "q14-section":
+        return "Les artistes à grande discographie s'adaptent-ils aux sous-genres populaires ?"
+    elif current == "q13-section":
+        return "Et les artistes s'adaptent-ils aux caractéristiques audio populaires ?"
     else:
         return "Welcome to Spotify Songs Analysis!"
 

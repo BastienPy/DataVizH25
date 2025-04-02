@@ -60,3 +60,60 @@ body {
 .custom-button:hover {
     background-color: #333;
 }
+
+/* q1 styling */
+
+/* color for slider q1 */
+#year-slider .rc-slider-track {
+    background-color: #1DB954 !important; 
+    height: 4px;
+}
+
+#year-slider .rc-slider-handle {
+    border-color: #1DB954 !important;      
+    background-color: #1DB954 !important;
+    height: 10px;
+}
+
+#year-slider .rc-slider-dot-active {
+    border-color: #1DB954 !important;
+    height: 10px;
+}
+
+/* Main control (selected item box) */
+.custom-dropdown .Select-control {
+    background-color: #121212;
+    border-color: #1DB954;
+}
+
+/* Selected item text */
+.custom-dropdown .Select-value-label {
+    color: #1DB954 !important;
+}
+
+/* Menu background */
+.custom-dropdown .Select-menu-outer {
+    background-color: #121212 !important;
+    border-color: #1DB954;
+}
+
+/* Individual option styling */
+.custom-dropdown .Select-option {
+    background-color: #121212 !important;
+    color: #1DB954 !important;
+}
+
+/* Hovered option */
+.custom-dropdown .Select-option.is-focused {
+    background-color: #1DB954 !important;
+    color: #121212 !important;
+}
+
+/* Selected option */
+.custom-dropdown .Select-option.is-selected {
+    font-weight: bold;
+    background-color: #121212 !important;
+    color: #1DB954 !important;
+}
+
+/* end of q1 styling */
