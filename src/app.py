@@ -10,7 +10,6 @@ app.title = 'Spotify Songs Analysis'
 import q1
 import q2
 import q5
-# import q8
 import q5
 import q11
 import q14
@@ -21,8 +20,6 @@ q1.register_callbacks(app)
 q2.register_callbacks(app)
 q5.register_callbacks(app)
 q14.register_callbacks(app)
-# q8.register_callbacks(app)
-q8.register_callbacks(app) 
 q13.register_callbacks(app)
 
 # Top navigation bar with anchor links for scrolling.
@@ -42,19 +39,17 @@ navbar = html.Div(
             href="#q5-section"
         ),
         html.A(
-            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q8 Analysis"],
-            # href="#q8-section"
-        ),
-        html.A(
             [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q11 Analysis"],
             href="#q11-section"
         ),
         html.A(
             [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q14 Analysis"],
             href="#q14-section"
+        ),
+        html.A(
             [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q13 Analysis"],
             href="#q13-section"
-        ),
+        )
     ],
     className="navbar"
 )
@@ -148,13 +143,6 @@ content = html.Div(
             id="q5-section",
             style={"padding-top": "60px", "margin-top": "-60px"}
         ),
-        html.Hr(style={"border-color": "#1DB954"}),
-        # Q8 Section with an id for anchor scrolling.
-        # html.Div(
-        #     q8.layout,
-        #     id="q8-section",
-        #     style={"padding-top": "60px", "margin-top": "-60px"}
-        # ),
         html.Hr(style={"border-color": "#1DB954"}),
         # Q11 Section with an id for anchor scrolling.
         html.Div(
