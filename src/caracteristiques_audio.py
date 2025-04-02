@@ -4,7 +4,7 @@ from dash.dependencies import Input, Output
 
 # Dictionnaire des explications pour chaque caractéristique audio.
 explanations = {
-    'danceability': "Danceability (dancabilité) décrit dans quelle mesure un morceau est adapté à la danse, en se basant sur des éléments comme le tempo, la stabilité du rythme, la force de la pulsation et la régularité globale. Une valeur de 0.0 signifie que le morceau est peu dansant, tandis que 1.0 indique un morceau très dansant.",
+    'danceability': "Danceability (dansant) décrit dans quelle mesure un morceau est adapté à la danse, en se basant sur des éléments comme le tempo, la stabilité du rythme, la force de la pulsation et la régularité globale. Une valeur de 0.0 signifie que le morceau est peu dansant, tandis que 1.0 indique un morceau très dansant.",
     'energy': "Energy (énergie) est une mesure de l'intensité et de l'activité ressenties dans un morceau, sur une échelle de 0.0 à 1.0. Des morceaux à haute énergie paraissent rapides, forts et parfois agressifs.",
     'key': "Key (clef) correspond à la tonalité estimée du morceau. Les entiers représentent les notes selon la notation standard (ex : 0 = C, 1 = C♯/D♭, 2 = D, etc.). Si aucune tonalité n’est détectée, la valeur est -1.",
     'loudness': "Loudness (intensité) mesure l'intensité sonore globale d'un morceau en décibels (dB). Les valeurs, généralement comprises entre -60 et 0 dB, permettent de comparer le volume relatif des morceaux.",
