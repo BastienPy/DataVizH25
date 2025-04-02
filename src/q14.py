@@ -292,10 +292,11 @@ layout = html.Div([
             html.Label("Sélectionnez un genre:", style={"color": "black"}),
             dcc.Dropdown(
                 id='genre_dropdown',
-                options=[{'label': g.capitalize(), 'value': g, 'style': {'color': 'black'}} for g in ['edm', 'latin', 'pop', 'r&b', 'rap', 'rock']],
+                options=[{'label': g.capitalize(), 'value': g,} for g in ['edm', 'latin', 'pop', 'r&b', 'rap', 'rock']],
                 placeholder="Sélectionnez un genre",
                 style={"color": "black", "margin-bottom": "20px"}
             ),
+            
             dcc.Graph(id='subgenre_graph-q15')
         ], style={"width": "50%", "display": "inline-block", "verticalAlign": "top", "padding": "10px"}),
 
