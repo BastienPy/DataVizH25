@@ -145,14 +145,16 @@ def register_callbacks(app):
             font=dict(color="white") 
         )
         
-        for i in range(1, 7):
+        for i, feature in enumerate(features):
+            row = (i // 3) + 1
+            col = (i % 3) + 1
             fig.update_yaxes(
-                title_text="Index", 
+                title_text=f"Index de {feature.capitalize()}", 
                 title_font=dict(color="white"),  
                 tickfont=dict(color="white"), 
                 showgrid=False, 
-                row=(i-1)//3 + 1, 
-                col=(i-1)%3 + 1
+                row=row, 
+                col=col
             )
             fig.update_xaxes(
                 title_text="Année", 
@@ -162,8 +164,8 @@ def register_callbacks(app):
                 tickmode="array", 
                 tickvals=df_popular_updated["year_group"].dt.year.unique(),  
                 ticktext=[str(year) for year in df_popular_updated["year_group"].dt.year.unique()], 
-                row=(i-1)//3 + 1, 
-                col=(i-1)%3 + 1
+                row=row, 
+                col=col
             )
-        
+            
         return html.Div([dcc.Graph(figure=fig,style={'width': '100%', 'height': '800px'})])
