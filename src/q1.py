@@ -111,7 +111,9 @@ layout = html.Div([
                 
                 
     html.Div(id="charts-container", style={"display": "grid", "grid-template-columns": "repeat(3, 1fr)", "gap": "20px"}),
-    dcc.Store(id='story-page-q1', data=1)
+    dcc.Store(id='story-page-q1', data=1),
+    dcc.Store(id="features-store", data=carac_audio),
+
     
 ])
 
@@ -137,7 +139,8 @@ def register_callbacks(app):
         Output("year-slider", "value"),
         Output("genre-dropdown", "value"),
         Output("page-indicator-q1", "children"),
-        Input("story-page-q1", "data")
+        Output("features-store", "data"), 
+        Input("story-page-q1", "data"),
     )
     def display_story(page):
         text = ""
@@ -160,20 +163,23 @@ def register_callbacks(app):
             text = "Nous pouvons ainsi conclure que les musiques récentes ont certaines caractéristiques audio différentes."
         elif page == 6:
             text = "Les caractéristiques exceptées key et liveness présentent des tendances et des évolutions notables au fil du temps"
+            features = [f for f in carac_audio if f not in ["key", "liveness"]]
         elif page == 7:
             text = "Alors que les caractéristiques Key et Liveness reste relativement stable au fil du temps et donc intemporelles"
+            features = ["key", "liveness"]
 
-        return text, year_range, genre, f"{page}/7"
+        return text, year_range, genre, f"{page}/7", features
 
     @app.callback(
         Output("charts-container", "children"),
         Input("year-slider", "value"),
-        Input("genre-dropdown", "value")
+        Input("genre-dropdown", "value"),
+        Input("features-store", "data")
     )
-    def update_charts(year_range, selected_genre):
+    def update_charts(year_range, selected_genre, features):
         filtered_df = filter_df(year_range, selected_genre)
         charts = []
-        for i, feature in enumerate(carac_audio):
+        for i, feature in enumerate(features):
             show_colorbar = ((i + 1) % 3 == 0) or (i == len(carac_audio) - 1)
             fig = px.scatter(
                 filtered_df.copy(),
@@ -183,11 +189,36 @@ def register_callbacks(app):
                 color="year",
                 color_continuous_scale="Viridis",
                 labels={"track_popularity": "Popularité Moyenne", feature: feature.capitalize(), "year": "Année"},
-                title=f"{feature.capitalize()} vs Popularité"
+                title=f"{feature.capitalize()} vs Popularity"
+            )
+            fig.update_traces(
+                marker=dict(opacity=0.95),
+                hovertemplate=(
+                    f"{feature.capitalize()}: %{{x:.6f}}<br>"
+                    "Popularité Moyenne: %{y:.5f}<br>"
+                    "Année: %{marker.color}"
+                )
             )
             if not show_colorbar:
                 fig.update_coloraxes(showscale=False)
-            fig.update_layout(title_x=0.5, height=350)
+            fig.update_layout(
+                title_x=0.5, 
+                yaxis_title="Popularity", 
+                xaxis_title=feature.capitalize(),
+                title_font_color='white',
+                xaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+                yaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+                coloraxis_colorbar=dict(
+                tickfont=dict(color='white'),
+                title=dict(font=dict(color='white'))
+                ),
+                plot_bgcolor='#121212', 
+                paper_bgcolor='#121212',
+                height=350,
+                showlegend=True  
+                )
+            
+            
             charts.append(html.Div(dcc.Graph(figure=fig), style={"textAlign": "center"}))
         return charts
 
