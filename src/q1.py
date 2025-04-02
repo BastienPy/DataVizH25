@@ -63,7 +63,8 @@ layout = html.Div([
         value='all',
         
         clearable=False,
-        style={"color":"black","width": "30%", "margin-bottom": "10px"}
+        style={"width": "30%", "margin-bottom": "10px"},
+        className="custom-dropdown",
     ),
     html.Label("Sélectionnez l'intervalle de temps :"),
     # dcc.RadioItems(
@@ -81,7 +82,7 @@ layout = html.Div([
         max=grouped_df["year"].max(),
         value=[1970, 2020],
         marks={str(year): str(year) for year in range(grouped_df["year"].min(), grouped_df["year"].max()+1, 10)},
-        step=10
+        step=10,
     ),
 
                 # Boutons centrés au-dessus du graphique
@@ -106,7 +107,7 @@ layout = html.Div([
                     'marginTop': '20px',
                     'textAlign': 'center'
                 },
-                children="Pour certaines caractéristiques audio on remarque une très faible corrélation entre leur variations et celles de la popularité indiquant un rôle faible dans la popularité de la musique."
+                children="Pour les caractéristiques audio on remarque une très faible corrélation entre leur variations et celles de la popularité indiquant un rôle faible dans la popularité de la musique."
             ),
                 
                 

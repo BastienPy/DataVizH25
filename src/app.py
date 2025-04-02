@@ -14,6 +14,7 @@ import q5
 import q5
 import q11
 import q14
+import q13
 
 # Register callbacks for the sections.
 q1.register_callbacks(app)
@@ -21,6 +22,8 @@ q2.register_callbacks(app)
 q5.register_callbacks(app)
 q14.register_callbacks(app)
 # q8.register_callbacks(app)
+q8.register_callbacks(app) 
+q13.register_callbacks(app)
 
 # Top navigation bar with anchor links for scrolling.
 navbar = html.Div(
@@ -49,6 +52,8 @@ navbar = html.Div(
         html.A(
             [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q14 Analysis"],
             href="#q14-section"
+            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q13 Analysis"],
+            href="#q13-section"
         ),
     ],
     className="navbar"
@@ -164,6 +169,11 @@ content = html.Div(
             id="q14-section",
             style={"padding-top": "60px", "margin-top": "-60px"}
         ),
+        html.Div(
+            q13.layout,
+            id="q13-section",
+            style={"padding-top": "60px", "margin-top": "-60px"}
+        )
     ],
     className="content"
 )
@@ -289,7 +299,9 @@ def update_speech(current):
     elif current == "q8-section":
         return "Uncovering Q8 trends!"
     elif current == "q11-section":
-        return "Wrapping up with Q11 findings!"
+        return "Q11 findings are here!"
+    elif current == "q11-section":
+        return "Wrapping up with Q13 findings!"
     else:
         return "Welcome to Spotify Songs Analysis!"
 
