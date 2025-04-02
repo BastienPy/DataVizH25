@@ -1,6 +1,11 @@
 import pandas as pd
 from dash import dcc, html, Input, Output
 import plotly.express as px
+from dash import State
+from dash import callback_context as ctx
+from dash import ctx, no_update
+
+
 
 # Path to dataset and audio features list.
 dataset_path = "./dataset/spotify_songs_clean.csv"
@@ -40,14 +45,11 @@ grouped_df,grouped_df_genre = preprocess_data()
 
 def filter_df(year_range, genre):
     start_year, end_year = year_range
-    if genre == 'all':
+    if genre == "all":
         return grouped_df[(grouped_df["year"] >= start_year) & (grouped_df["year"] <= end_year)]
     else:
-        return grouped_df_genre[
-            (grouped_df_genre["year"] >= start_year) &
-            (grouped_df_genre["year"] <= end_year) &
-            (grouped_df_genre["playlist_genre"] == genre)
-        ]
+        filtered = grouped_df_genre[(grouped_df_genre["playlist_genre"] == genre)]
+        return filtered[(filtered["year"] >= start_year) & (filtered["year"] <= end_year)]
 
 # Export the layout as a variable.
 layout = html.Div([
@@ -64,15 +66,15 @@ layout = html.Div([
         style={"color":"black","width": "30%", "margin-bottom": "10px"}
     ),
     html.Label("Sélectionnez l'intervalle de temps :"),
-    dcc.RadioItems(
-        id="time-interval",
-        options=[
-            {"label": "Décennie", "value": "decade"},
-            {"label": "Année", "value": "year"}
-        ],
-        value="decade",
-        inline=True
-    ),
+    # dcc.RadioItems(
+    #     id="time-interval",
+    #     options=[
+    #         {"label": "Décennie", "value": "decade"},
+    #         {"label": "Année", "value": "year"}
+    #     ],
+    #     value="decade",
+    #     inline=True
+    # ),
     dcc.RangeSlider(
         id="year-slider",
         min=grouped_df["year"].min(),
@@ -81,84 +83,149 @@ layout = html.Div([
         marks={str(year): str(year) for year in range(grouped_df["year"].min(), grouped_df["year"].max()+1, 10)},
         step=10
     ),
-    html.Div(id="charts-container", style={"display": "grid", "grid-template-columns": "repeat(3, 1fr)", "gap": "20px"})
+
+                # Boutons centrés au-dessus du graphique
+                html.Div([
+                    html.Button("← Précédent", id="prev-button-q1", n_clicks=0, className='custom-button'),
+                    html.Button("Suivant →", id="next-button-q1", n_clicks=0, className='custom-button'),
+                    html.Div(id="page-indicator-q1", style={"padding": "0 20px", "color": "white"}),
+                ], style={
+                    'display': 'flex',
+                    'justifyContent': 'center',
+                    'gap': '20px',
+                    'marginTop': '20px',
+                    'marginBottom': '20px'
+                }),
+                            # Analyse à droite
+            html.Div(
+                id="analysis-text-q1",
+                style={
+                    # 'width': '800px',
+                    'color': 'white',
+                    'fontSize': '16px',
+                    'marginTop': '20px',
+                    'textAlign': 'center'
+                },
+                children="Pour certaines caractéristiques audio on remarque une très faible corrélation entre leur variations et celles de la popularité indiquant un rôle faible dans la popularité de la musique."
+            ),
+                
+                
+    html.Div(id="charts-container", style={"display": "grid", "grid-template-columns": "repeat(3, 1fr)", "gap": "20px"}),
+    dcc.Store(id='story-page-q1', data=1),
+    dcc.Store(id="features-store", data=carac_audio),
+
+    
 ])
 
 # Register callbacks with the main app.
 def register_callbacks(app):
     @app.callback(
-        Output("year-slider", "step"),
-        Output("year-slider", "marks"),
-        Output("year-slider", "value"),
-        [Input("time-interval", "value"),
-         Input("year-slider", "value")]
+        Output("story-page-q1", "data"),
+        Input("next-button-q1", "n_clicks"),
+        Input("prev-button-q1", "n_clicks"),
+        State("story-page-q1", "data"),
+        prevent_initial_call=True
     )
-    def update_slider_mode(mode, current_range):
-        start_year, end_year = current_range
-        if mode == "year":
-            step = 1
-            marks = {str(year): str(year) for year in range(grouped_df["year"].min(), grouped_df["year"].max()+1, 5)}
-            value = [max(grouped_df["year"].min(), start_year), min(grouped_df["year"].max(), end_year)]
-        else:  # decade
-            step = 10
-            marks = {str(year): str(year) for year in range(grouped_df["year"].min(), grouped_df["year"].max()+1, 10)}
-            value = [max(grouped_df["year"].min(), round(start_year / 10) * 10), min(grouped_df["year"].max(), round(end_year / 10) * 10)]
-        return step, marks, value
+    def update_story_page(n_next, n_prev, current):
+        triggered = ctx.triggered_id
+        if triggered == "next-button-q1":
+            return 1 if current == 7 else current + 1
+        elif triggered == "prev-button-q1":
+            return 7 if current == 1 else current - 1
+        return current
+
+    @app.callback(
+        Output("analysis-text-q1", "children"),
+        Output("year-slider", "value"),
+        Output("genre-dropdown", "value"),
+        Output("page-indicator-q1", "children"),
+        Output("features-store", "data"), 
+        Input("story-page-q1", "data"),
+    )
+    def display_story(page):
+        text = ""
+        genre = "all"
+        year_range = [1970, 2020]
+        features = carac_audio.copy()
+
+        if page == 1:
+            text = "Pour certaines caractéristiques audio on remarque une très faible corrélation entre leur variations et celles de la popularité indiquant un rôle faible dans la popularité de la musique."
+        elif page == 2:
+            text = "Même pour un genre spécifique, on n’observe pas un impact important des caractéristique audio sur la popularité d’une musique. Vous pouvez aussi explorer les données pour un genre de votre choix en utilisant le filtre par genre."
+            genre = "pop"
+        elif page == 3:
+            text = "Les musiques anciennes présentent un mode, valence et loudness faible."
+            year_range = [1970, 2010]
+        elif page == 4:
+            text = "Les musique récentes présentent un mode, valence et loudness élevé"
+            year_range = [2010, 2020]
+        elif page == 5:
+            text = "Nous pouvons ainsi conclure que les musiques récentes ont certaines caractéristiques audio différentes."
+        elif page == 6:
+            text = "Les caractéristiques exceptées key et liveness présentent des tendances et des évolutions notables au fil du temps"
+            features = [f for f in carac_audio if f not in ["key", "liveness"]]
+        elif page == 7:
+            text = "Alors que les caractéristiques Key et Liveness reste relativement stable au fil du temps et donc intemporelles"
+            features = ["key", "liveness"]
+
+        return text, year_range, genre, f"{page}/7", features
 
     @app.callback(
         Output("charts-container", "children"),
-        [Input("year-slider", "value"),
-        Input("genre-dropdown", "value")]
+        Input("year-slider", "value"),
+        Input("genre-dropdown", "value"),
+        Input("features-store", "data")
     )
-    def update_charts(selected_years, selected_genre):
-        start_year, end_year = selected_years
-        filtered_df = filter_df([start_year, end_year], selected_genre)
-        if selected_genre != "all":
-            filtered_df = filtered_df[filtered_df["playlist_genre"] == selected_genre]
+    def update_charts(year_range, selected_genre, features):
+        filtered_df = filter_df(year_range, selected_genre)
         charts = []
-        total_features = len(carac_audio)
-        for i, feature in enumerate(carac_audio):
-            filtered_df = filtered_df.copy()
-            filtered_df["fixed_size"] = 20  # adding a dummy column to have a fixed size for bubbles
-            
-            # getting index of last subchart in row
+        for i, feature in enumerate(features):
             show_colorbar = ((i + 1) % 3 == 0) or (i == len(carac_audio) - 1)
-            
             fig = px.scatter(
-                filtered_df, 
-                x=feature,  
-                y="track_popularity",  
-                size='fixed_size', 
+                filtered_df.copy(),
+                x=feature,
+                y="track_popularity",
+                size=[20]*len(filtered_df),
                 color="year",
                 color_continuous_scale="Viridis",
-                title=f"{feature.capitalize()} vs Popularité",
                 labels={"track_popularity": "Popularité Moyenne", feature: feature.capitalize(), "year": "Année"},
+                title=f"{feature.capitalize()} vs Popularity"
             )
             fig.update_traces(
-                marker=dict(opacity=0.7),
+                marker=dict(opacity=0.95),
                 hovertemplate=(
                     f"{feature.capitalize()}: %{{x:.6f}}<br>"
                     "Popularité Moyenne: %{y:.5f}<br>"
                     "Année: %{marker.color}"
                 )
             )
-            #showing year color only once per row 
             if not show_colorbar:
                 fig.update_coloraxes(showscale=False)
             fig.update_layout(
-                title_x=0.5,
-                yaxis_title="Popularité", 
+                title_x=0.5, 
+                yaxis_title="Popularity", 
                 xaxis_title=feature.capitalize(),
+                title_font_color='white',
+                xaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+                yaxis=dict(title_font=dict(color='white'), tickfont=dict(color='white')),
+                coloraxis_colorbar=dict(
+                tickfont=dict(color='white'),
+                title=dict(font=dict(color='white'))
+                ),
+                plot_bgcolor='#121212', 
+                paper_bgcolor='#121212',
                 height=350,
                 showlegend=True  
-            )
-            # centering last row
-            remaining = total_features % 3
-            is_last = i == total_features - 1
-            needs_centering = remaining == 1 and is_last
-            style = {"width": "100%", "textAlign": "center"}
-            if needs_centering:
-                style["gridColumn"] = "2 / 3"  # center in the second column of 3
-            charts.append(html.Div(dcc.Graph(figure=fig), style=style))
-
+                )
+            
+            
+            charts.append(html.Div(dcc.Graph(figure=fig), style={"textAlign": "center"}))
         return charts
+
+
+
+
+
+
+        
+
