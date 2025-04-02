@@ -100,6 +100,14 @@ mascot_speech = html.Div(
         'borderRadius': '10px'
     }
 )
+narrative_q1 = html.Div(
+    dcc.Markdown("""
+    ### Story Time
+    Let's explore the impact of audio caracteristics 
+    on a song popularity and their evolution over time
+    """),
+    style={'padding': '20px', 'backgroundColor': '#181818', 'borderRadius': '8px'}
+)
 
 narrative = html.Div(
     dcc.Markdown("""
@@ -113,6 +121,8 @@ narrative = html.Div(
 content = html.Div(
     [
         # Q1 Section with an id for anchor scrolling.
+        narrative,
+        html.Hr(style={"border-color": "#1DB954"}),
         html.Div(
             q1.layout,
             id="q1-section",
