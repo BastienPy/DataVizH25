@@ -172,10 +172,17 @@ def data_preprocess_custom(path,genre_filter, bins=10, start_date=None, end_date
 
 
 def get_figure_genre():
+    genres_couleurs = {
+        "rock": "#FF0000",       # Rouge
+        "latin": "#FFA500",      # Orange
+        "edm": "#f542f5",        # Rose
+        "rap": "#800080",        # Violet
+        "r&b": "#008000",        # Vert
+        "pop": "#ADD8E6"         # Bleu clair
+    }
     genre_data = data_preprocess("./dataset/spotify_songs_clean.csv", "playlist_genre", "playlist_genre")
     fig = px.area(genre_data, x="decennie", y="percentage", color="playlist_genre", line_group="playlist_genre", hover_data=["playlist_genre"],
-                  color_discrete_sequence=px.colors.qualitative.Dark2)
-
+                  color_discrete_map=genres_couleurs)
     fig.update_layout(
                 height=500,
                 legend_title_text="Genre",
@@ -272,9 +279,6 @@ def get_hover_template_custom(type_name):
 # app = dash.Dash(__name__)
 
 layout = html.Div([
-    html.H4("Évolution de la proportion des sous-genres musicaux par genre et artiste",
-            style={"fontWeight": "bold", "fontSize": "30px", "textAlign": "center"}),
-
     # Graphe des genres
     html.Div([
         html.H4("Évolution de la proportion des genres", style={"fontWeight": "bold", "fontSize": "20px", "textAlign": "center"}),
@@ -289,24 +293,26 @@ layout = html.Div([
     # Graphes des sous-genres et artistes
     html.Div([
         html.Div([
-            html.Label("Sélectionnez un genre:", style={"color": "black"}),
+            html.Label("Sélectionnez un genre:", style={"color": "white"}),
             dcc.Dropdown(
                 id='genre_dropdown',
                 options=[{'label': g.capitalize(), 'value': g,} for g in ['edm', 'latin', 'pop', 'r&b', 'rap', 'rock']],
                 placeholder="Sélectionnez un genre",
-                style={"color": "black", "margin-bottom": "20px"}
+                style={"width": "80%"},
+                className='custom-dropdown'
             ),
             
             dcc.Graph(id='subgenre_graph-q15')
         ], style={"width": "50%", "display": "inline-block", "verticalAlign": "top", "padding": "10px"}),
 
         html.Div([
-            html.Label("Sélectionnez un artiste:", style={"color": "black"}),
+            html.Label("Sélectionnez un artiste:", style={"color": "white"}),
             dcc.Dropdown(
                 id='artist_dropdown',
                 placeholder="Sélectionnez un artiste",
                 optionHeight=35,
-                style={"color": "black", "margin-bottom": "20px"}
+                style={"width": "80%"},
+                className='custom-dropdown'
             ),
             dcc.Graph(id='artist_subgenre_graph')
         ], style={"width": "50%", "display": "inline-block", "verticalAlign": "top", "padding": "10px"})
