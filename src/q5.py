@@ -62,16 +62,43 @@ layout = html.Div([
         ),
         style={'width': '60%', 'margin': '0 auto'}  
     ),
-    html.Div(id='graphs-container')
+        html.Div(
+    [
+        html.Label("Sélectionne un genre :", style={'color': 'white'}),
+        dcc.RadioItems(
+            id='genre-selector',
+            options=[{'label': 'Tous', 'value': 'all'}] + [{'label': genre.capitalize(), 'value': genre} for genre in df_popular['playlist_genre'].unique()],
+            value='all',  # Set "Tous" as the default selection
+            labelStyle={'display': 'inline-block', 'margin-right': '10px', 'color': 'white'}
+        )
+    ],
+    style={'textAlign': 'center', 'marginTop': '20px'}
+),
+
+    html.Div(id='graphs-container'),
 ])
 
 
 def register_callbacks(app):
+    analyses = {
+    "tous" : "Sélectionnez un genre pour voir l'analyse.",
+    "edm": "L'EDM a évolué vers une complexité émotionnelle et sonore. La baisse de la 'valence' traduit une préférence pour des ambiances plus mélancoliques, tandis que la chute de la 'speechiness' montre un éloignement des éléments vocaux au profit de l'instrumentation. L'augmentation de la 'liveness' suggère une intégration croissante d'enregistrements live, c'est le seul à avoir cette caractéristique en augmentation notable, et la baisse du 'loudness' reflète une recherche de subtilité sonore.",
+    "latin": "Le genre latin a montré une évolution marquée vers des sonorités plus dynamiques et émotionnelles. La 'danceability', en constante augmentation, reflète une adaptation aux pistes de danse et une popularité croissante. L'énergie, également en hausse, traduit une intensité accrue dans les productions, tandis que la 'speechiness', en progression, indique une place importante des éléments vocaux dans ce genre. La 'valence', bien que légèrement en baisse, conserve des tonalités majoritairement positives, et la 'loudness', en baisse puis se stabilisant par la suite, montre son adaptation aux goûts actuels.",
+    "pop": "La pop a évolué vers une production plus calibrée et émotionnellement diversifiée. La 'danceability' s’est maintenue à un niveau élevé, confirmant son orientation grand public et adaptée aux pistes de danse. L'énergie, bien qu'en légère baisse, reflète un équilibre entre intensité et accessibilité. La 'speechiness', en hausse, traduit une intégration croissante de paroles narratives ou chantées. La 'valence' en déclin révèle une transition vers des tonalités plus introspectives, tandis que la 'loudness' reste stable, témoignant d’une recherche de constance dans l’impact sonore.",
+    "r&b": "Le R&B a vu une transformation notable depuis 1998 avec des fluctuations de la 'valence', traduisant une recherche de tonalités variées. L'augmentation de l' 'energy' avec une diminution de la 'loudness' montre une évolution vers des productions plus intenses mais moins bruyantes. L’augmentation modérée de la 'speechiness' reflète l’importance continue des paroles narratives dans ce style.",
+    "rap": "Le rap a connu, depuis 1998, une stabilité de la 'speechiness', soulignant son ancrage dans le récit et les paroles dominantes. La baisse progressive de la 'valence' indique un virage vers des thèmes plus sérieux ou sombres. Malgré cela, la 'loudness' élevée combinée à une 'energy' en déclin traduit l’intensité caractéristique du genre, montrant que le rap conserve son impact sonore puissant tout en s’adaptant aux nouvelles tendances moins énergétiques.",
+    "rock": "Depuis 1998, le rock a vu sa 'valence' diminuer progressivement, reflétant un virage vers des tonalités plus sombres ou introspectives. La 'loudness' ainsi que la 'danceability' restent relativement stables mais légèrement inférieures à ses sommets passés, suggérant un adoucissement global du genre. L'augmentation de la 'speechiness' pourrait indiquer un retour à des productions avec une plus grande présence d'éléments vocaux."
+    }
+
+
+
     @app.callback(
         Output('graphs-container', 'children'),
-        Input('base-year-slider', 'value')
+        Input('base-year-slider', 'value'),
+        Input('genre-selector', 'value')
     )
-    def update_graphs(base_year):
+    def update_graphs(base_year, selected_genre):
+
         df_popular_updated = calculate_index(df_popular, base_year=base_year)
         features = ["danceability", "energy", "speechiness", "liveness", "valence", "loudness"]
         genres_couleurs = {
@@ -112,6 +139,8 @@ def register_callbacks(app):
             for genre in df_popular_updated["playlist_genre"].unique():
                 genre_df = df_popular_updated[df_popular_updated["playlist_genre"] == genre]
                 
+                opacity = 1.0 if selected_genre == 'all' or genre == selected_genre else 0.2
+
                 fig.add_trace(
                     go.Scatter(
                         x=genre_df["year_group"],
@@ -120,11 +149,13 @@ def register_callbacks(app):
                         legendgroup=genre,
                         showlegend=True if i == 0 else False,
                         hovertemplate=f"<b>Genre:</b> {genre}<br><b>Index:</b> %{{y:.2f}}<extra></extra>",
-                        line=dict(width=2, color=genres_couleurs.get(genre, "#FFFFFF")) 
+                        line=dict(width=2, color=genres_couleurs.get(genre, "#FFFFFF")),
+                        opacity=opacity
                     ),
                     row=row,
                     col=col
                 )
+
         
         
         fig.update_layout(
