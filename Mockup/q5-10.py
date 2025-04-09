@@ -37,12 +37,22 @@ def calculate_index(df_popular, base_year=1998):
     for feature in features:
         for genre in df_popular["playlist_genre"].unique():
             base_value = base_values[base_values["playlist_genre"] == genre][feature].values[0]
-            df_popular.loc[(df_popular["playlist_genre"] == genre), f"{feature}_index"] = df_popular[feature] / base_value * 100
+            df_popular.loc[(df_popular["playlist_genre"] == genre), f"{feature}_index"] = (
+                (df_popular[feature] - base_value) / base_value * 100
+            )  # Calculate percentage change relative to the base year
     return df_popular
 
 def create_dashboard(df):
     app = dash.Dash(__name__)
     features = ["danceability", "energy", "speechiness", "liveness", "valence", "loudness"]
+    genres_couleurs = {
+        "rock": "#FF0000",        # Rouge
+        "latin": "#FFA500",      # Orange
+        "edm": "#f542f5",        # Rose
+        "rap": "#800080",        # Violet
+        "r&b": "#008000",        # Vert
+        "pop": "#ADD8E6"         # Bleu clair
+    }
     df_popular = filter_popular_songs(df)
     
     min_year = df_popular["year_group"].dt.year.min()
@@ -50,6 +60,7 @@ def create_dashboard(df):
 
     app.layout = html.Div([
         html.H1("Évolution des caractéristiques musicales pour tous les genres"),
+        html.Div(
         dcc.Slider(
             id='base-year-slider',
             min=min_year,
@@ -58,6 +69,8 @@ def create_dashboard(df):
             marks={str(year): str(year) for year in range(min_year, max_year + 1, 3)},
             step=3
         ),
+        style={'width': '60%', 'margin': '0 auto'}  # Réduit la largeur et centre le slider
+    ),
         html.Div(id='graphs-container')
     ])
 
@@ -68,11 +81,24 @@ def create_dashboard(df):
     def update_graphs(base_year):
         df_popular_updated = calculate_index(df_popular, base_year=base_year)
         
+        # Mapping features to emojis
+        feature_emojis = {
+            "danceability": "💃",
+            "energy": "⚡",
+            "speechiness": "🗣️",
+            "liveness": "🎤",
+            "valence": "😊",
+            "loudness": "🔊"
+        }
+        
         # Créer une figure avec subplots
         fig = make_subplots(
             rows=2, 
             cols=3,
-            subplot_titles=[f"Évolution de l'index de {feature.capitalize()}" for feature in features],
+            subplot_titles=[
+                f"{feature_emojis[feature]} Évolution de l'index de {feature.capitalize()}" 
+                for feature in features
+            ],
             vertical_spacing=0.15,
             horizontal_spacing=0.1
         )
@@ -93,7 +119,8 @@ def create_dashboard(df):
                         legendgroup=genre,  # Même groupe pour toutes les traces du même genre
                         showlegend=True if i == 0 else False,  # Afficher la légende seulement pour le premier subplot
                         hovertemplate=f"<b>Genre:</b> {genre}<br><b>Index:</b> %{{y:.2f}}<extra></extra>",
-                        line=dict(width=2)),
+                        line=dict(width=2, color=genres_couleurs.get(genre, "#FFFFFF"))  # Utiliser la couleur définie ou blanc par défaut
+                    ),
                     row=row,
                     col=col
                 )
@@ -103,11 +130,12 @@ def create_dashboard(df):
             legend=dict(
                 orientation="h",
                 yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1,
+                y=-0.2,
+                xanchor="center",
+                x=0.5,
                 title_text="Genres:",
-                font=dict(color="white")  # Set legend text color to white
+                font=dict(color="white"), # Set legend text color to white
+                
                 
             ),
             height=800,
@@ -133,6 +161,9 @@ def create_dashboard(df):
                 title_font=dict(color="white"),  # Set x-axis title color to white
                 tickfont=dict(color="white"),  # Set x-axis tick color to white
                 showgrid=False,  # Remove x-axis grid lines
+                tickmode="array",  # Set tick mode to array
+                tickvals=df_popular_updated["year_group"].dt.year.unique(),  # Use unique years from the dataframe
+                ticktext=[str(year) for year in df_popular_updated["year_group"].dt.year.unique()],  # Convert years to strings
                 row=(i-1)//3 + 1, 
                 col=(i-1)%3 + 1
             )

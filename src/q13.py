@@ -55,23 +55,49 @@ def generate_line_chart(selected_feature):
     ))
 
     fig.update_layout(
-        title=f"Évolution de {selected_feature} au fil du temps (après 1970)",
-        xaxis_title="Année",
-        yaxis_title=selected_feature,
-        template="plotly_white"
-    )
+    title=dict(text=f"Évolution de {selected_feature} au fil du temps (après 1970)", font=dict(size=20, color='white')),
+    xaxis_title="Année",
+    yaxis_title=selected_feature,
+    xaxis=dict(showgrid=True, title_font=dict(color='white'), tickfont=dict(color='white')),
+    yaxis=dict(showgrid=True, title_font=dict(color='white'), tickfont=dict(color='white')),
+    legend=dict(font=dict(color='white')),
+    legend_title=dict(font=dict(color='white')),
+    plot_bgcolor='#121212',
+    paper_bgcolor='#121212',
+    height=600,
+)
+
     
     return fig
 
 # Layout pour l'intégration dans app.py
+
+narrative_q13 = html.Div(
+    [
+        dcc.Markdown("""  
+        
+        Cette visualisation compare l’évolution musicale générale avec celle des artistes ayant une longue carrière (plus de 30 ans).  
+        On remarque que la tendance globale (courbe bleue) montre des changements progressifs dans les caractéristiques comme la **danceability**, l’**énergie** ou la **valence**.  
+        En revanche, les artistes de longue carrière (courbe verte) conservent des valeurs plus stables dans le temps.  
+
+        Cela suggère qu’ils arrivent à **adapter leur musique aux tendances** sans forcément changer complètement leur style.  
+        On peut donc dire que la **longévité artistique** permet de rester populaire tout en gardant une certaine **cohérence musicale**.  
+
+        Cette analyse complète les observations précédentes en montrant que **l’expérience** et la capacité à évoluer sont aussi des facteurs importants dans le succès musical.
+        """)
+    ],
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px'}
+)
+
 layout = html.Div([
     html.H2("Évolution des caractéristiques musicales des artistes", style={"textAlign": "center"}),
+    narrative_q13,
     html.Label("Sélectionnez une caractéristique musicale:"),
     dcc.Dropdown(
-        id='feature-dropdown-q13',  # identifiant unique pour éviter les conflits
+        id='feature-dropdown-q13',
         options=[{'label': feature.capitalize(), 'value': feature} for feature in features],
         value='track_popularity',
-        clearable=False
+        className='custom-dropdown'
     ),
     dcc.Graph(id='line_chart-q13')
 ])

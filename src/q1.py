@@ -7,7 +7,7 @@ from dash import ctx, no_update
 
 
 
-# Path to dataset and audio features list.
+# dataset et carac audio
 dataset_path = "./dataset/spotify_songs_clean.csv"
 carac_audio = [
     "danceability", "energy", "key", "loudness", "mode", 
@@ -97,11 +97,11 @@ layout = html.Div([
                     'marginTop': '20px',
                     'marginBottom': '20px'
                 }),
-                            # Analyse à droite
+            #analyse et texte
             html.Div(
                 id="analysis-text-q1",
                 style={
-                    # 'width': '800px',
+                    # 'width': '900px',
                     'color': 'white',
                     'fontSize': '16px',
                     'marginTop': '20px',
@@ -150,23 +150,42 @@ def register_callbacks(app):
         features = carac_audio.copy()
 
         if page == 1:
-            text = "Pour certaines caractéristiques audio on remarque une très faible corrélation entre leur variations et celles de la popularité indiquant un rôle faible dans la popularité de la musique."
+            text = html.Span([
+                "En observant les graphiques, on remarque une très faible corrélation entre les variations des caractéristiques energy, loudness, danceability et celles de la popularité.",
+                html.Br(),
+                "Pour les autres caractéristiques, il n’existe pas de relation directe et systématique entre la valeur d’une caractéristique audio et la popularité d’une chanson,",
+                html.Br(),
+                "ce qui indique que les caractéristiques audio jouent un rôle limité dans la popularité de la musique."
+            ])
+
         elif page == 2:
-            text = "Même pour un genre spécifique, on n’observe pas un impact important des caractéristique audio sur la popularité d’une musique. Vous pouvez aussi explorer les données pour un genre de votre choix en utilisant le filtre par genre."
+            text = html.Span([
+                "Même en filtrant par genres, dans ce cas le “pop”, on n’observe pas une forte corrélation entre les caractéristiques audio et la popularité d’une chanson au sein de genres spécifiques.",
+                html.Br(),
+                "Vous pouvez aussi explorer les données pour un genre de votre choix en utilisant le filtre par genre."
+            ])
             genre = "pop"
         elif page == 3:
-            text = "Les musiques anciennes présentent un mode, valence et loudness faible."
+            text = "Les musiques anciennes présentent un mode, valence et loudness élevés"
             year_range = [1970, 2010]
         elif page == 4:
-            text = "Les musique récentes présentent un mode, valence et loudness élevé"
+            text = "Alors que les musique récentes présentent un mode, valence et loudness plus faibles"
             year_range = [2010, 2020]
         elif page == 5:
-            text = "Nous pouvons ainsi conclure que les musiques récentes ont certaines caractéristiques audio différentes."
+            text = html.Span([
+                "Ce qui indique que les musiques récentes présentent des caractéristiques audio différentes, avec une tendance vers des morceaux plus mélancoliques,",
+                html.Br(),
+                "moins puissants et davantage influencés par des éléments instrumentaux et vocaux."
+            ])
         elif page == 6:
-            text = "Les caractéristiques exceptées key et liveness présentent des tendances et des évolutions notables au fil du temps"
+            text = "Les caractéristiques audio exceptées key et liveness présentent des tendances et des évolutions notables au fil du temps"
             features = [f for f in carac_audio if f not in ["key", "liveness"]]
         elif page == 7:
-            text = "Alors que les caractéristiques Key et Liveness reste relativement stable au fil du temps et donc intemporelles"
+            text = html.Span([
+                "Alors que les caractéristiques Key et Liveness restent relativement stables au fil du temps et intemporelles, suggérant que ni la répartition des tonalités musicales",
+                html.Br(),
+                "ni la présence d'effets de public en direct dans les chansons populaires n'ont significativement évolué au fil des années."
+            ])
             features = ["key", "liveness"]
 
         return text, year_range, genre, f"{page}/7", features
@@ -180,8 +199,13 @@ def register_callbacks(app):
     def update_charts(year_range, selected_genre, features):
         filtered_df = filter_df(year_range, selected_genre)
         charts = []
+        total_features = len(features)
+        charts_per_row = 3
+        if len(features) == 2:
+            charts_per_row = 2
         for i, feature in enumerate(features):
-            show_colorbar = ((i + 1) % 3 == 0) or (i == len(carac_audio) - 1)
+            # getting index of last subchart in row
+            show_colorbar = ((i + 1) % charts_per_row == 0) or (i == len(features) - 1)
             fig = px.scatter(
                 filtered_df.copy(),
                 x=feature,
@@ -218,9 +242,15 @@ def register_callbacks(app):
                 height=350,
                 showlegend=True  
                 )
+            # centering last row
+            remaining = total_features % 3
+            is_last = i == total_features - 1
+            needs_centering = remaining == 1 and is_last
+            style = {"width": "100%", "textAlign": "center"}
+            if needs_centering:
+                style["gridColumn"] = "2 / 3"  # center in the second column of 3
+            charts.append(html.Div(dcc.Graph(figure=fig), style=style))
             
-            
-            charts.append(html.Div(dcc.Graph(figure=fig), style={"textAlign": "center"}))
         return charts
 
 

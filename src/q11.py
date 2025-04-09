@@ -67,10 +67,31 @@ def get_figure():
     )
     return fig
 
-# app = dash.Dash(__name__)
+narrative_q11 = html.Div(
+
+)
 
 layout = html.Div([
-    html.H4("Étude de la popularité des artistes en fonction de leur diversité musicale", style={"fontWeight": "bold", "fontSize": "30px"}),
-    dcc.Graph(id="graph-q11", figure = get_figure()),
+    html.Div([
+        dcc.Graph(id="graph-q11", figure=get_figure()),
+    ], style={'width': '60%', 'display': 'inline-block'}),
+    html.Div([
+        dcc.Markdown("""
+            Une discographie diversifiée (avec de nombreux sous-genres) semble impacter positivement la popularité. 
+            On pourrait expliquer ce phénomène en supposant que ces artistes :
+            - **s’adaptent à leur environnement** en explorant des sous-genres différents pour parfaire leurs musiques vis à vis de leurs auditoires.
+            - **aux modes des époques** pour perdurer dans le temps.
+            
+            Une majorité des artistes ne possède qu’un seul genre, montrant possiblement la difficulté à changer de style. Ils ont également en moyenne la **popularité** la plus faible.
+            """, style={'backgroundColor': '#121212'}),
+            html.Br(),
+            html.Br(),
+            html.Br(),
+            html.Br(),
+        dcc.Markdown("""
+            ### Attention cependant à la lecture de ce graphique!
+            Un grand nombre de sous-genre peut signifier beaucoup de tests de la part des artistes en questions, mais pas forcément que ceux-ci ont fait un album complet de chaque genre.
+        """, style={'backgroundColor': '#121212'}),
+    ], style={'width': '40%', 'display': 'inline-block', 'verticalAlign': 'top', "marginTop": "100px", 'color': 'white'}),
 ])
 

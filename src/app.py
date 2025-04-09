@@ -108,8 +108,7 @@ mascot_speech = html.Div(
 narrative_q1 = html.Div(
     dcc.Markdown("""
     ### Story Time
-    Let's explore the impact of audio caracteristics 
-    on a song popularity and their evolution over time
+    A REMPLIR
     """),
     style={'padding': '20px', 'backgroundColor': '#181818', 'borderRadius': '8px'}
 )
@@ -117,10 +116,49 @@ narrative_q1 = html.Div(
 narrative = html.Div(
     dcc.Markdown("""
     ### Story Time
-    Did you know that the popularity of a song can be influenced by its audio features?
+    Saviez-vous que la pupularité d'une musique est influencé par ses caractéristiques audio ?
     """),
     style={'padding': '20px', 'backgroundColor': '#181818', 'borderRadius': '8px'}
 )
+
+narrative_q13 = html.Div(
+    [
+        dcc.Markdown("""  
+        
+        Cette visualisation compare l’évolution musicale générale avec celle des artistes ayant une longue carrière (plus de 30 ans).  
+        On remarque que la tendance globale (courbe bleue) montre des changements progressifs dans les caractéristiques comme la **danceability**, l’**énergie** ou la **valence**.  
+        En revanche, les artistes de longue carrière (courbe verte) conservent des valeurs plus stables dans le temps.  
+
+        Cela suggère qu’ils arrivent à **adapter leur musique aux tendances** sans forcément changer complètement leur style.  
+        On peut donc dire que la **longévité artistique** permet de rester populaire tout en gardant une certaine **cohérence musicale**.  
+
+        Cette analyse complète les observations précédentes en montrant que **l’expérience** et la capacité à évoluer sont aussi des facteurs importants dans le succès musical.
+        """)
+    ],
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px'}
+)
+
+narrative_q14 = html.Div(
+    [
+        dcc.Markdown("""
+        ### Analyse de l'évolution des genres des artistes
+                     
+        Il est maintenant possible de s'attarder non plus sur les caractéristiques des musiques elles-mêmes, mais sur l'évolution des artistes et des genres qu'ils créent.
+                     
+        On peut y apprendre de nombreux éléments sur l'évolution des goûts musicaux. 
+        Par exemple, le rock semblait être le plus populaire dans les années 1970 (on peut alors penser à l'apparition de groupes comme les Rolling Stones, U2 ou Radiohead…)
+        alors que l'EDM a lui émergé dans les années 2000.
+        """),
+        html.Br(),
+        dcc.Markdown("""
+        Vous pouvez **choisir un genre** en particulier pour observer les évolutions de ses sous-genres, ainsi que choisir un des artistes de ce genre pour observer l'évolution de sa discographie !
+        
+        *Il est ainsi possible de remarquer par exemple que pour le rap, le hip-hop qui représente aujourd'hui la majeure partie du genre, n'existait pas avant les années 1990 !*
+        """)
+    ],
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px'}
+)
+
 
 # Main content area that includes all sections.
 content = html.Div(
@@ -162,11 +200,13 @@ content = html.Div(
         ),
         html.Hr(style={"border-color": "#1DB954"}),
         # Q14 Section with an id for anchor scrolling.
+        narrative_q14,
         html.Div(
             q14.layout,
             id="q14-section",
             style={"padding-top": "60px", "margin-top": "-60px"}
         ),
+        html.Hr(style={"border-color": "#1DB954"}),
         html.Div(
             q13.layout,
             id="q13-section",
