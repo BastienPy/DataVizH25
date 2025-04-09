@@ -285,6 +285,11 @@ layout = html.Div([
         dcc.Graph(id="graph-q8", figure=get_figure_genre(), style={"margin": "0 auto", "width": "80%"})
     ], style={"textAlign": "center"}),
 
+    # TODO : à compléter
+    html.Div([
+        html.H4("Sélectionnez votre genre et votre artiste préféré et voyez si votre idole suit le flow !", style={"textAlign": "center", "margin": "20px 0"})
+    ]),
+
     # Graphes des sous-genres et artistes
     html.Div([
         html.Div([
