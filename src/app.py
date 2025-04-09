@@ -121,6 +121,23 @@ narrative = html.Div(
     style={'padding': '20px', 'backgroundColor': '#181818', 'borderRadius': '8px'}
 )
 
+narrative_q13 = html.Div(
+    [
+        dcc.Markdown("""  
+        
+        Cette visualisation compare l’évolution musicale générale avec celle des artistes ayant une longue carrière (plus de 30 ans).  
+        On remarque que la tendance globale (courbe bleue) montre des changements progressifs dans les caractéristiques comme la **danceability**, l’**énergie** ou la **valence**.  
+        En revanche, les artistes de longue carrière (courbe verte) conservent des valeurs plus stables dans le temps.  
+
+        Cela suggère qu’ils arrivent à **adapter leur musique aux tendances** sans forcément changer complètement leur style.  
+        On peut donc dire que la **longévité artistique** permet de rester populaire tout en gardant une certaine **cohérence musicale**.  
+
+        Cette analyse complète les observations précédentes en montrant que **l’expérience** et la capacité à évoluer sont aussi des facteurs importants dans le succès musical.
+        """)
+    ],
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px'}
+)
+
 narrative_q14 = html.Div(
     [
         dcc.Markdown("""
@@ -189,6 +206,7 @@ content = html.Div(
             id="q14-section",
             style={"padding-top": "60px", "margin-top": "-60px"}
         ),
+        html.Hr(style={"border-color": "#1DB954"}),
         html.Div(
             q13.layout,
             id="q13-section",
