@@ -26,6 +26,7 @@ Flask==1.1.2
 Flask-Compress==1.5.0
 Flask-Failsafe==0.2
 future==0.18.2
+gunicorn==19.7.1
 idna==2.10
 imageio==2.8.0
 importlib_metadata==8.5.0
