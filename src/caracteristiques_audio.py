@@ -24,14 +24,6 @@ options = [{'label': feature.capitalize(), 'value': feature} for feature in expl
 # Définition de la mise en page pour la page "Caractéristiques Audio".
 layout = html.Div([
     html.H1("Caractéristiques Audio", style={'color': '#1DB954'}),
-    dcc.Markdown("""
-    **Intro :**  
-    Écouter de la musique est un plaisir universel. Mais qu’est-ce qui fait que vous préférez une chanson à une autre ?  
-    Qu’est-ce qui fait la “popularité” que Spotify attribue aux chansons ? Plongez avec nous dans la data de l’industrie musicale  
-    pour essayer de démêler les secrets du succès musical.
-
-    **Première étape : les caractéristiques audio !**
-    """),
     dcc.Dropdown(
         id='audio-feature-dropdown',
         options=options,
@@ -41,7 +33,7 @@ layout = html.Div([
     ),
     html.Div(
         id='audio-feature-explanation',
-        style={'marginTop': '20px', 'fontSize': '18px', 'lineHeight': '1.5'}
+        style={'marginTop': '20px'}
     )
 ], style={'padding': '20px'})
 

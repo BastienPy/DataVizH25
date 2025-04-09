@@ -110,10 +110,16 @@ navbar = html.Div(
 #     }
 # )
 narrative_q1 = html.Div(
-    dcc.Markdown("""
-    ### Story Time
-    A REMPLIR
-    """),
+    [
+        html.H1("Introduction", style={'color': '#1DB954'}),
+        dcc.Markdown(""" 
+        Écouter de la musique est un plaisir universel. Mais qu’est-ce qui fait que vous préférez une chanson à une autre ?  
+        Qu’est-ce qui fait la “popularité” que Spotify attribue aux chansons ? Plongez avec nous dans la data de l’industrie musicale  
+        pour essayer de démêler les secrets du succès musical.
+
+        **Première étape : les caractéristiques audio !**
+        """)
+    ],
     style={'padding': '20px', 'backgroundColor': '#181818', 'borderRadius': '8px'}
 )
 
@@ -352,5 +358,5 @@ def update_speech(current):
         return "Welcome to Spotify Songs Analysis!"
 
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+# if __name__ == '__main__':
+#     app.run_server(debug=True)
