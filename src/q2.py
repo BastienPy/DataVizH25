@@ -168,7 +168,7 @@ layout = html.Div([
                 # Graphique
                 dcc.Graph(
                     id="music-matrix",
-                    figure=create_figure(colors),
+                    figure=create_figure(colors),   
                     config={'staticPlot': False}
                 )
             ]),
@@ -321,18 +321,19 @@ def register_callbacks(app):
                 temp_colors[y, selected_column] = "#90EE90"
 
         # Analyses par caractéristique
-        analyses = {
-            "loudness": "Le volume sonore est lié à l'énergie et entraîne moins d'acousticness. Pour la pop, latin et r&b, il transmet la positivité par la valence.",
-            "energy": "",
-            "acousticness": "",
-            "valence": "",
-            "danceability": "",
-            "tempo": "",
-            "instrumentalness": "",
-            "duration_ms": "",
-            "speechiness": "",
-            "liveness": ""
-        }
+            analyses = {
+                "loudness": "La loudness est un élément central pour tous les genres, étroitement associé à l'énergie et inversement lié à l’acousticness. Dans les genres comme la Pop, le Latin et le R&B, il contribue à transmettre une ambiance positive via la valence.",
+                "energy": "L’énergie constitue une caractéristique clé, notamment dans la Pop, le Latin et le R&B, où elle va de pair avec une forte loudness. Elle est généralement opposée à l’acousticness, révélant un contraste entre sons produits et ambiances acoustiques.",
+                "acousticness": "L’acousticness présente une corrélation négative avec l’énergie et le volume, traduisant une atmosphère plus douce et organique. Elle est peu présente dans les genres modernes et très produits comme l’EDM, la Pop ou le Rock.",
+                "valence": "La valence, reflet de la positivité émotionnelle, est une variable influente dans tous les genres. Elle est souvent renforcée par l’énergie et la danceability, ce qui en fait un indicateur clé des morceaux joyeux et entraînants.",
+                "danceability": "La danceability est largement valorisée dans la plupart des genres — sauf le Rap — pour générer une ambiance positive. En R&B, elle occupe une place centrale et dépend de multiples facteurs comme l’énergy ou la loudness, illustrant une richesse musicale.",
+                "tempo": "Le tempo intervient comme un facteur structurant dans tous les styles, à l’exception du Rap. Un rythme trop rapide peut limiter la danceability dans certains genres (Pop, Latin, EDM), mais dans l’EDM, il soutient directement l’energy.",
+                "instrumentalness": "L’instrumentalness se révèle importante dans l’EDM et le Rap, bien que de façon opposée : l’EDM favorise les sons artificiels puissants, tandis que le Rap alterne entre morceaux vocaux dominants et productions plus instrumentales.",
+                "duration_ms": "La durée des morceaux joue un rôle secondaire, sauf en EDM et en Rock. Dans ces styles, des morceaux plus courts peuvent amplifier l’impact sonore et émotionnel, en accentuant la puissance ou la positivité du morceau.",
+                "speechiness": "La speechiness est une dimension particulièrement marquée dans le Rock, où les passages parlés apportent intensité et énergie. Elle contribue à renforcer le lien avec l’auditeur.",
+                "liveness": "L’EDM se distingue par sa liveness, suggérant une forte interaction avec le public. Cela renforce l’effet de loudness et d’énergy, en particulier lorsqu’une ambiance de concert est recréée à l’écoute."
+            }
+
         analysis = analyses.get(selected_characteristic, "")
 
         return create_figure(temp_colors), selected_column, analysis

@@ -1,19 +1,23 @@
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
+import os
+import sys
 
 # Create the main Dash app instance.
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 app.title = 'Spotify Songs Analysis'
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 # Import your sections (q1, q2, q8, q11 must export a "layout" variable)
-import caracteristiques_audio
-import q1
-import q2
-import q5
-import q11
-import q14
-import q13
+from . import caracteristiques_audio
+from . import q1
+from . import q2
+from . import q5
+from . import q11
+from . import q14
+from . import q13
 
 # Register callbacks for the sections.
 caracteristiques_audio.register_callbacks(app)
@@ -32,84 +36,90 @@ navbar = html.Div(
             href="#def-section"
         ),
         html.A(
-            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q1 Analysis"],
+            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Caractéristiques"],
             href="#q1-section"
         ),
         html.A(
-            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q2 Analysis"],
+            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Corrélation"],
             href="#q2-section"
         ),
         html.A(
-            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q5 Analysis"],
+            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Évolutions"],
             href="#q5-section"
         ),
         html.A(
-            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q11 Analysis"],
+            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Discographie"],
             href="#q11-section"
         ),
         html.A(
-            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q14 Analysis"],
+            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Adaptation"],
             href="#q14-section"
         ),
         html.A(
-            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Q13 Analysis"],
+            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Longévité"],
             href="#q13-section"
         )
     ],
     className="navbar"
 )
 
-# Mascot element – the image that can be clicked to hide it.
-mascot = html.Div(
-    html.Img(src="/assets/mascot.png", style={'height': '150px'}),
-    id='mascot',
-    n_clicks=0,  # for toggling
-    style={
-        'position': 'fixed',
-        'bottom': '20px',
-        'left': '0px',
-        'zIndex': '1001',
-        'display': 'block'
-    }
-)
+# # Mascot element – the image that can be clicked to hide it.
+# mascot = html.Div(
+#     html.Img(src="/assets/mascot.png", style={'height': '150px'}),
+#     id='mascot',
+#     n_clicks=0,  # for toggling
+#     style={
+#         'position': 'fixed',
+#         'bottom': '20px',
+#         'left': '0px',
+#         'zIndex': '1001',
+#         'display': 'block'
+#     }
+# )
 
-# Toggle button that appears when the mascot is hidden.
-mascot_toggle_btn = html.Button(
-    html.I(className="fa-solid fa-eye"),
-    id='mascot-toggle-btn',
-    n_clicks=0,
-    style={
-        'position': 'fixed',
-        'bottom': '20px',
-        'left': '0px',
-        'zIndex': '1002',
-        'display': 'none',
-        'backgroundColor': '#1DB954',
-        'border': 'none',
-        'color': 'white',
-        'padding': '10px',
-        'borderRadius': '5px'
-    }
-)
+# # Toggle button that appears when the mascot is hidden.
+# mascot_toggle_btn = html.Button(
+#     html.I(className="fa-solid fa-eye"),
+#     id='mascot-toggle-btn',
+#     n_clicks=0,
+#     style={
+#         'position': 'fixed',
+#         'bottom': '20px',
+#         'left': '0px',
+#         'zIndex': '1002',
+#         'display': 'none',
+#         'backgroundColor': '#1DB954',
+#         'border': 'none',
+#         'color': 'white',
+#         'padding': '10px',
+#         'borderRadius': '5px'
+#     }
+# )
 
-# Speech bubble for the mascot.
-mascot_speech = html.Div(
-    id='mascot-speech',
-    children="Welcome to Spotify Songs Analysis!",
-    style={
-        'position': 'fixed',
-        'bottom': '180px',
-        'left': '0px',
-        'backgroundColor': '#1DB954',
-        'padding': '10px',
-        'borderRadius': '10px'
-    }
-)
+# # Speech bubble for the mascot.
+# mascot_speech = html.Div(
+#     id='mascot-speech',
+#     children="Welcome to Spotify Songs Analysis!",
+#     style={
+#         'position': 'fixed',
+#         'bottom': '180px',
+#         'left': '0px',
+#         'backgroundColor': '#1DB954',
+#         'padding': '10px',
+#         'borderRadius': '10px'
+#     }
+# )
 narrative_q1 = html.Div(
-    dcc.Markdown("""
-    ### Story Time
-    A REMPLIR
-    """),
+    [
+        html.H1("Introduction", style={'color': '#1DB954'}),
+        dcc.Markdown(""" 
+        Écouter de la musique est un plaisir universel. Mais qu’est-ce qui fait que vous préférez une chanson à une autre ?  
+        Qu’est-ce qui fait la “popularité” que Spotify attribue aux chansons ? Plongez avec nous dans la data de l’industrie musicale  
+        pour essayer de démêler les secrets du succès musical.
+
+        **Première étape : les caractéristiques audio !**
+        """)
+    ],
     style={'padding': '20px', 'backgroundColor': '#181818', 'borderRadius': '8px'}
 )
 
@@ -216,26 +226,26 @@ content = html.Div(
     className="content"
 )
 
-# An Interval component that fires every 1000ms (adjust as needed).
-interval = dcc.Interval(id="scroll-interval", interval=1000, n_intervals=0)
+# # An Interval component that fires every 1000ms (adjust as needed).
+# interval = dcc.Interval(id="scroll-interval", interval=1000, n_intervals=0)
 
-# A hidden Store to keep track of the current section.
-current_section_store = dcc.Store(id="current-section", data="")
+# # A hidden Store to keep track of the current section.
+# current_section_store = dcc.Store(id="current-section", data="")
 
-# A Store to keep track of the mascot's visibility (True = visible).
-mascot_state = dcc.Store(id="mascot-state", data=True)
+# # A Store to keep track of the mascot's visibility (True = visible).
+# mascot_state = dcc.Store(id="mascot-state", data=True)
 
 # Overall app layout (added Interval, Stores, and the toggle button).
 app.layout = html.Div([
     dcc.Location(id="url"),
-    interval,
-    current_section_store,
-    mascot_state,
+    # interval,
+    # current_section_store,
+    # mascot_state,
     navbar,
     content,
-    mascot,              # Mascot image.
-    mascot_toggle_btn,   # Toggle button.
-    mascot_speech        # Speech bubble.
+    # mascot,              # Mascot image.
+    # mascot_toggle_btn,   # Toggle button.
+    # mascot_speech        # Speech bubble.
 ])
 
 
@@ -348,5 +358,5 @@ def update_speech(current):
         return "Welcome to Spotify Songs Analysis!"
 
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+# if __name__ == '__main__':
+#     app.run_server(debug=True)
