@@ -52,7 +52,6 @@ def get_figure():
     fig.update_traces(hovertemplate=get_hover_template())
 
     fig.update_layout(
-        title=dict(text="<b>Popularité moyenne des artistes en fonction du nombre de sous-genres<b>", font=dict(size=20,color='white')),
         xaxis_title="Nombre de sous-genres",
         yaxis_title="Popularité moyenne",
         xaxis=dict(showgrid=True,title_font=dict(color='white'), tickfont=dict(color='white')),
@@ -67,11 +66,8 @@ def get_figure():
     )
     return fig
 
-narrative_q11 = html.Div(
-
-)
-
 layout = html.Div([
+    html.H1("Popularité moyenne des artistes en fonction du nombre de sous-genres"),
     html.Div([
         dcc.Graph(id="graph-q11", figure=get_figure()),
     ], style={'width': '60%', 'display': 'inline-block'}),

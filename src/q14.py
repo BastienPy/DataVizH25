@@ -186,7 +186,6 @@ def get_figure_genre():
     fig.update_layout(
                 height=500,
                 legend_title_text="Genre",
-                title_font=dict(color='white'),
                 plot_bgcolor='#121212', 
                 paper_bgcolor='#121212',
                 legend=dict(font=dict(color='white')),
@@ -276,15 +275,29 @@ def get_hover_template_custom(type_name):
     )
 
 
-# app = dash.Dash(__name__)
-
 layout = html.Div([
-    # Graphe des genres
+    html.H1("Évolution de la proportion des genres"),
     html.Div([
-        html.H4("Évolution de la proportion des genres", style={"fontWeight": "bold", "fontSize": "20px", "textAlign": "center"}),
-        dcc.Graph(id="graph-q8", figure=get_figure_genre(), style={"margin": "0 auto", "width": "80%"})
-    ], style={"textAlign": "center"}),
-
+        dcc.Graph(id="graph-q8", figure=get_figure_genre())
+    ], style={'width': '50%', 'display': 'inline-block'}),
+    html.Div([
+        dcc.Markdown("""
+        ### Analyse de l'évolution des genres des artistes
+                     
+        Il est maintenant possible de s'attarder non plus sur les caractéristiques des musiques elles-mêmes, mais sur l'évolution des artistes et des genres qu'ils créent.
+                     
+        On peut y apprendre de nombreux éléments sur l'évolution des goûts musicaux. 
+        Par exemple, le rock semblait être le plus populaire dans les années 1970 (on peut alors penser à l'apparition de groupes comme les Rolling Stones, U2 ou Radiohead…)
+        alors que l'EDM a lui émergé dans les années 2000.
+        """),
+        html.Br(),
+        dcc.Markdown("""
+        Vous pouvez **choisir un genre** en particulier pour observer les évolutions de ses sous-genres, ainsi que choisir un des artistes de ce genre pour observer l'évolution de sa discographie !
+        
+        *Il est ainsi possible de remarquer par exemple que pour le rap, le hip-hop qui représente aujourd'hui la majeure partie du genre, n'existait pas avant les années 1990 !*
+        """)
+        ],
+    style={'width': '50%', 'display': 'inline-block', 'verticalAlign': 'top', "marginTop": "100px", 'color': 'white'}),
     # TODO : à compléter
     html.Div([
         html.H4("Sélectionnez votre genre et votre artiste préféré et voyez si votre idole suit le flow !", style={"textAlign": "center", "margin": "20px 0"})
@@ -461,6 +474,7 @@ def register_callbacks(app):
             "<b>Pourcentage cumulatif:</b> %{y:.3f}%<extra></extra>"
         ))
         fig.update_yaxes(title_text='Pourcentage cumulatif (%)')
+        fig.update_xaxes(title_text='Date')
 
         fig.update_layout(height=500,
                 title=f"Évolution cumulée des sous-genres pour {selected_artist} ({selected_genre})",
