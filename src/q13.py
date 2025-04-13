@@ -53,9 +53,15 @@ def generate_line_chart(selected_feature):
         '<b>Nombre de morceaux: </b>%{text}<br>' +
         '<extra></extra>'
     ))
+    if selected_feature == "energy":
+        title = f"Évolution de l'{selected_feature} au cours du temps"
+    elif selected_feature == "tempo":
+        title = f"Évolution du {selected_feature} au cours du temps"
+    else : 
+        title = f"Évolution de la {selected_feature} au cours du temps"
 
     fig.update_layout(
-    title=dict(text=f"Évolution de {selected_feature} au fil du temps (après 1970)", font=dict(size=20, color='white')),
+    title=dict(text=title, font=dict(size=20, color='white')),
     xaxis_title="Année",
     yaxis_title=selected_feature,
     xaxis=dict(showgrid=True, title_font=dict(color='white'), tickfont=dict(color='white')),
@@ -76,14 +82,18 @@ narrative_q13 = html.Div(
     [
         dcc.Markdown("""  
         
-        Cette visualisation compare l’évolution musicale générale avec celle des artistes ayant une longue carrière (plus de 30 ans).  
-        On remarque que la tendance globale (courbe bleue) montre des changements progressifs dans les caractéristiques comme la **danceability**, l’**énergie** ou la **valence**.  
-        En revanche, les artistes de longue carrière (courbe verte) conservent des valeurs plus stables dans le temps.  
+        Pour terminer ce storytelling, il est possible d'intéresser à la différence entre les artistes possédant une longue carrière (plus de 30 ans !) et les autres.
+        Cela permet d'observer si ces artistes suivent des tendances similaires au reste, c'est-à-dire s'ils s'adaptent à l'évolution des goûts musicaux. 
 
-        Cela suggère qu’ils arrivent à **adapter leur musique aux tendances** sans forcément changer complètement leur style.  
+        *Qu'observe-t-on alors ? Les deux courbes se suivent presque systématiquement !*
+        
+        Cela suggère que les artistes avec une grande longévité arrivent à **adapter leur musique aux tendances** sans forcément changer complètement leur style.  
         On peut donc dire que la **longévité artistique** permet de rester populaire tout en gardant une certaine **cohérence musicale**.  
 
         Cette analyse complète les observations précédentes en montrant que **l’expérience** et la capacité à évoluer sont aussi des facteurs importants dans le succès musical.
+        
+        
+        De légères différences sont remarquables cependant, comme pour la **valence** au milieu des années 2010, où les artistes avec une longue carrière semblent créer des musiques bien plus joyeuses que les autres.
         """)
     ],
     style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px'}
