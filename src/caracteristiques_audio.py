@@ -3,7 +3,7 @@ from dash import Dash, html, dcc, Input, Output, ALL
 # Exemple de dictionnaire d'explication
 explanations = {
     'acousticness': {
-        'description': "Acousticness (acousticité) est une mesure de confiance (de 0.0 à 1.0) indiquant si le morceau est acoustique. Une valeur de 1.0 signifie que le morceau est très probablement acoustique.",
+        'description': "Acousticness (acousticité) est une mesure de confiance (de 0.0 à 1.0) indiquant si le morceau est acoustique, c’est-à-dire joué principalement avec des instruments non électroniques. Une valeur de 1.0 signifie que le morceau est très probablement acoustique.",
         'high_example_name': "Oh My Love - John Lennon",
         'low_example_name': "Centless Apprentice - Nirvana"
     },
