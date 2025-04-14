@@ -173,6 +173,7 @@ content = html.Div(
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
         narrative_q2,
+        html.Hr(style={"border-color": "#1DB954"}),
         # Q2 Section with an id for anchor scrolling.
         html.Div(
             q2.layout,
