@@ -109,7 +109,7 @@ navbar = html.Div(
 #         'borderRadius': '10px'
 #     }
 # )
-narrative_q1 = html.Div(
+narrative = html.Div(
     [
         html.H1(
             "Quels ingrédients font le hit parfait… et comment ont-ils évolué avec le temps ?",
@@ -138,63 +138,73 @@ narrative_q1 = html.Div(
         ),
     ],)
 
-narrative = html.Div(
+narrative_q1 = html.Div(
     dcc.Markdown("""
     Maintenant que vous êtes devenus des connaisseurs, penchons-nous de plus près sur ces caractéristiques audio.
-    Ces dimensions — comme la danceability ou encore la loudness — ont-elles évolué au fil des années et jouent-elles un rôle clair dans la popularité des morceaux ?
+    Ces dimensions sonores, comme la danceability ou la loudness, ont-elles évolué au fil des années et jouent-elles un rôle clair dans la popularité des morceaux ?
     """),
-    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '5%', 'marginRight': '5%',}
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '5%', 'marginRight': '5%'}
+)
+
+narrative_q2 = html.Div(
+    dcc.Markdown("""
+    Il est difficile de tracer un lien direct entre une caractéristique audio et la popularité d’un morceau.
+    Prises isolément, elles ne suffisent pas à expliquer le succès musical. Mais peut-être que la clé réside dans leurs interactions.
+
+    Ensemble, les caractéristiques forment la signature sonore d’un morceau, et bien souvent, l’identité d’un genre.
+    Voyons comment elles interagissent, s’influencent, et dessinent les contours de nos styles musicaux préférés."""),
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '5%', 'marginRight': '5%'}
 )
 
 # Main content area that includes all sections.
 content = html.Div(
     [
         # Q1 Section with an id for anchor scrolling.
-        narrative_q1,
+        narrative,
         html.Div(
             caracteristiques_audio.layout,
             id="def-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
+            style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
-        narrative,
+        narrative_q1,
         html.Div(
             q1.layout,
             id="q1-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
+            style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
-        html.Hr(style={"border-color": "#1DB954"}),
+        narrative_q2,
         # Q2 Section with an id for anchor scrolling.
         html.Div(
             q2.layout,
             id="q2-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
+            style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
         html.Hr(style={"border-color": "#1DB954"}),
         # Q5 Section with an id for anchor scrolling
         html.Div(
             q5.layout,
             id="q5-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
+            style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
         html.Hr(style={"border-color": "#1DB954"}),
         # Q11 Section with an id for anchor scrolling.
         html.Div(
             q11.layout,
             id="q11-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
+            style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
         html.Hr(style={"border-color": "#1DB954"}),
         # Q14 Section with an id for anchor scrolling.
         html.Div(
             q14.layout,
             id="q14-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
+            style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
         html.Hr(style={"border-color": "#1DB954"}),
         html.Div(
             q13.layout,
             id="q13-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
+            style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         )
     ],
     className="content"

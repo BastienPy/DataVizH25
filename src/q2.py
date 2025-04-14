@@ -217,7 +217,7 @@ def register_callbacks(app):
         selected_column = all_columns[new_index]
 
         if selected_column is None:
-            return create_figure(stored_colors), None, "Les genres pop, latin et R&B partagent des caractéristiques communes, tandis que les autres genres se distinguent davantage par des particularités propres."
+            return create_figure(stored_colors), None, "La pop, latin et R&B partagent des caractéristiques communes, tandis que les autres genres se distinguent davantage par des particularités propres."
 
         selected_characteristic = x_labels[selected_column]
         temp_colors = stored_colors.copy()
@@ -322,7 +322,7 @@ def register_callbacks(app):
 
         # Analyses par caractéristique
             analyses = {
-                "loudness": "La loudness est un élément central pour tous les genres, étroitement associé à l'énergie et inversement lié à l’acousticness. Dans les genres comme la Pop, le Latin et le R&B, il contribue à transmettre une ambiance positive via la valence.",
+                "loudness": "La loudness est un élément important pour tous les genres. Elle accompagne souvent l’énergie pour intensifier un morceau. Dans la Pop, le Latin ou le R&B, elle soutient des ambiances joyeuses, renforcées par une valence plus élevée. À l’inverse, la loudness s’atténue dans les morceaux plus acoustiques.",
                 "energy": "L’énergie constitue une caractéristique clé, notamment dans la Pop, le Latin et le R&B, où elle va de pair avec une forte loudness. Elle est généralement opposée à l’acousticness, révélant un contraste entre sons produits et ambiances acoustiques.",
                 "acousticness": "L’acousticness présente une corrélation négative avec l’énergie et le volume, traduisant une atmosphère plus douce et organique. Elle est peu présente dans les genres modernes et très produits comme l’EDM, la Pop ou le Rock.",
                 "valence": "La valence, reflet de la positivité émotionnelle, est une variable influente dans tous les genres. Elle est souvent renforcée par l’énergie et la danceability, ce qui en fait un indicateur clé des morceaux joyeux et entraînants.",

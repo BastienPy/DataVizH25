@@ -82,7 +82,7 @@ narrative_q13 = html.Div(
     [
         dcc.Markdown("""  
         
-        Pour terminer ce storytelling, il est possible d'intéresser à la différence entre les artistes possédant une longue carrière (plus de 30 ans !) et les autres.
+        Il est possible d'intéresser à la différence entre les artistes possédant une longue carrière (plus de 30 ans !) et les autres.
         Cela permet d'observer si ces artistes suivent des tendances similaires au reste, c'est-à-dire s'ils s'adaptent à l'évolution des goûts musicaux. 
 
         *Qu'observe-t-on alors ? Les deux courbes se suivent presque systématiquement !*

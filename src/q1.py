@@ -53,7 +53,7 @@ def filter_df(year_range, genre):
 
 # Export the layout as a variable.
 layout = html.Div([
-    html.H1("Évolution des caractéristiques audio et leur impact sur la popularité"),
+    # html.H1("Évolution des caractéristiques audio et leur impact sur la popularité"),
     html.Label("Sélectionnez un genre :"),
     dcc.Dropdown(
         id='genre-dropdown',

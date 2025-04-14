@@ -4,7 +4,7 @@ from dash import Dash, html, dcc, Input, Output, ALL
 explanations = {
     'acousticness': {
         'description': "Acousticness (acousticité) est une mesure de confiance (de 0.0 à 1.0) indiquant si le morceau est acoustique. Une valeur de 1.0 signifie que le morceau est très probablement acoustique.",
-        'high_example_name': "Oh My Love (Remastered 2010) - John Lennon",
+        'high_example_name': "Oh My Love - John Lennon",
         'low_example_name': "Centless Apprentice - Nirvana"
     },
     'danceability': {
@@ -29,7 +29,7 @@ explanations = {
     },
     'liveness': {
         'description': "Liveness (en direct) détecte la présence d'un public dans l'enregistrement. Des valeurs élevées, notamment au-dessus de 0.8, suggèrent fortement que le morceau a été joué en live.",
-        'high_example_name': "Silence (Tiësto’s Big Room Remix) - Marshmello",
+        'high_example_name': "Silence - Marshmello",
         'low_example_name': "Finesse - Bruno Mars"
     },
     'loudness': {
@@ -45,7 +45,7 @@ explanations = {
     'speechiness': {
         'description': "Speechiness (le parlé) détecte la présence de paroles parlées dans un morceau. Des valeurs proches de 1.0 suggèrent un contenu fortement parlé (comme dans un podcast ou un spoken word), tandis que des valeurs faibles indiquent principalement de la musique.",
         'high_example_name': "Birdboy - NLE Choppa",
-        'low_example_name': "The Best of My Love (2013 Remaster) - Eagles"
+        'low_example_name': "The Best of My Love - Eagles"
     },
     'tempo': {
         'description': "Tempo correspond à la vitesse du morceau, exprimée en battements par minute (BPM), et détermine le rythme global du morceau.",
@@ -91,7 +91,7 @@ def get_feature_block(selected_key):
             ], style={'flex': '1', 'textAlign': 'left', 'marginBottom': '5px'}),
 
             html.Div([
-                html.P(html.B(f"Fort {selected_key} :"), style={'color': '#1DB954'}),
+                html.P(html.B(f"Fort·e {selected_key} :"), style={'color': '#1DB954'}),
                 html.P(feature_data['high_example_name']),
                 html.Img(
                     src="/assets/icons/play_icon.png",
@@ -137,7 +137,7 @@ layout = html.Div([
             )
             for feature in explanations
         ],
-        style={'marginBottom': '20px', 'display': 'flex', 'flexWrap': 'nowrap', 'marginLeft': '5%', 'marginRight': '5%', 'justifyContent': 'center', 'gap': '3px'}
+        style={'marginBottom': '20px', 'display': 'flex', 'flexWrap': 'nowrap', 'justifyContent': 'center', 'gap': '3px'}
     ),
 
     html.Div(
@@ -157,7 +157,7 @@ layout = html.Div([
     ),
 
     dcc.Store(id="dummy-store-audio")
-], style={'padding': '30px', 'backgroundColor': '#1e1e1e', 'marginLeft': '5%', 'marginRight': '5%'})
+], style={'padding': '30px', 'backgroundColor': '#1e1e1e'})
 
 def register_callbacks(app):
     @app.callback(
