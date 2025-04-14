@@ -23,7 +23,9 @@ from . import q13
 caracteristiques_audio.register_callbacks(app)
 q1.register_callbacks(app)
 q2.register_callbacks(app)
-
+q5.register_callbacks(app)
+q14.register_callbacks(app)
+q13.register_callbacks(app)
 
 # Top navigation bar with anchor links for scrolling.
 navbar = html.Div(
@@ -144,7 +146,6 @@ narrative = html.Div(
     style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '8%', 'marginRight': '8%',}
 )
 
-
 # Main content area that includes all sections.
 content = html.Div(
     [
@@ -169,6 +170,33 @@ content = html.Div(
             id="q2-section",
             style={"padding-top": "60px", "margin-top": "-60px"}
         ),
+        html.Hr(style={"border-color": "#1DB954"}),
+        # Q5 Section with an id for anchor scrolling
+        html.Div(
+            q5.layout,
+            id="q5-section",
+            style={"padding-top": "60px", "margin-top": "-60px"}
+        ),
+        html.Hr(style={"border-color": "#1DB954"}),
+        # Q11 Section with an id for anchor scrolling.
+        html.Div(
+            q11.layout,
+            id="q11-section",
+            style={"padding-top": "60px", "margin-top": "-60px"}
+        ),
+        html.Hr(style={"border-color": "#1DB954"}),
+        # Q14 Section with an id for anchor scrolling.
+        html.Div(
+            q14.layout,
+            id="q14-section",
+            style={"padding-top": "60px", "margin-top": "-60px"}
+        ),
+        html.Hr(style={"border-color": "#1DB954"}),
+        html.Div(
+            q13.layout,
+            id="q13-section",
+            style={"padding-top": "60px", "margin-top": "-60px"}
+        )
     ],
     className="content"
 )
