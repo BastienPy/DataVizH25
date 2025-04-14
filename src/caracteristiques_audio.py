@@ -1,7 +1,6 @@
-import dash
-from dash import dcc, html, Input, Output
+from dash import Dash, html, dcc, Input, Output, ALL
 
-# Dictionnaire des explications
+# Exemple de dictionnaire d'explication
 explanations = {
     'acousticness': {
         'description': "Acousticness (acousticité) est une mesure de confiance (de 0.0 à 1.0) indiquant si le morceau est acoustique. Une valeur de 1.0 signifie que le morceau est très probablement acoustique.",
@@ -56,7 +55,7 @@ explanations = {
     
 }
 
-# Fonction pour générer le bloc d'explication
+
 def get_feature_block(selected_key):
     feature_data = explanations[selected_key]
     explanation_block = [
@@ -65,29 +64,47 @@ def get_feature_block(selected_key):
             html.P(feature_data['description'])
         ], style={'flex': '2'})
     ]
-    
+
     if selected_key != 'duration_ms':
         explanation_block.extend([
             html.Div([
-                html.Div([
-                    html.P(html.B(f"Faible {selected_key} :"), style={'color': '#1DB954'}),
-                    html.P(feature_data['low_example_name']),
-                    html.Audio(src=f"/assets/audio/{selected_key}_low.mp3", controls=True)
-                ], style={'marginBottom': '30px'})
-            ], style={'flex': '1', 'textAlign': 'left'}),
+                html.P(html.B(f"Faible {selected_key} :"), style={'color': '#1DB954'}),
+                html.P(feature_data['low_example_name']),
+                html.Img(
+                    src="/assets/icons/play_icon.png",
+                    id={'type': 'audio-icon', 'index': f"{selected_key}-low"},
+                    style={'width': '30px', 'cursor': 'pointer'}
+                ),
+                html.Audio(
+                    id=f"{selected_key}-low-audio",
+                    src=f"/assets/audio/{selected_key}_low.mp3",
+                    controls=False,
+                    preload="none",
+                    style={'display': 'none'}
+                )
+            ], style={'flex': '1', 'textAlign': 'left', 'marginBottom': '30px'}),
 
             html.Div([
-                html.Div([
-                    html.P(html.B(f"Forte {selected_key} :"), style={'color': '#1DB954'}),
-                    html.P(feature_data['high_example_name']),
-                    html.Audio(src=f"/assets/audio/{selected_key}_high.mp3", controls=True)
-                ], style={'marginBottom': '30px'}),
+                html.P(html.B(f"Forte {selected_key} :"), style={'color': '#1DB954'}),
+                html.P(feature_data['high_example_name']),
+                html.Img(
+                    src="/assets/icons/play_icon.png",
+                    id={'type': 'audio-icon', 'index': f"{selected_key}-high"},
+                    style={'width': '30px', 'cursor': 'pointer'}
+                ),
+                html.Audio(
+                    id=f"{selected_key}-high-audio",
+                    src=f"/assets/audio/{selected_key}_high.mp3",
+                    controls=False,
+                    preload="none",
+                    style={'display': 'none'}
+                )
             ], style={'flex': '1', 'textAlign': 'left'})
         ])
 
     return explanation_block
 
-# Layout principal avec "acousticness" sélectionné par défaut
+
 layout = html.Div([
     html.Div(
         id='feature-tabs',
@@ -113,9 +130,10 @@ layout = html.Div([
         ],
         style={'marginBottom': '20px', 'display': 'flex', 'flexWrap': 'wrap'}
     ),
+
     html.Div(
         id='feature-explanation',
-        children=get_feature_block('acousticness'),
+        children=get_feature_block('danceability'),
         style={
             'backgroundColor': '#1e1e1e',
             'padding': '15px',
@@ -127,19 +145,21 @@ layout = html.Div([
             'justifyContent': 'space-between',
             'gap': '40px'
         }
-    )
+    ),
+
+    dcc.Store(id="dummy-store-audio")
 ], style={'padding': '30px', 'backgroundColor': '#1e1e1e'})
 
-# Callback
 def register_callbacks(app):
     @app.callback(
         Output('feature-explanation', 'children'),
-        Output({'type': 'feature-tab', 'index': dash.dependencies.ALL}, 'style'),
-        Input({'type': 'feature-tab', 'index': dash.dependencies.ALL}, 'n_clicks_timestamp')
+        Output({'type': 'feature-tab', 'index': ALL}, 'style'),
+        Input({'type': 'feature-tab', 'index': ALL}, 'n_clicks_timestamp')
     )
+
     def update_feature(n_clicks_timestamps):
         if not n_clicks_timestamps or all(ts == 0 for ts in n_clicks_timestamps):
-            selected_key = 'acousticness'
+            selected_key = 'danceability'
         else:
             selected_idx = n_clicks_timestamps.index(max(n_clicks_timestamps))
             selected_key = list(explanations.keys())[selected_idx]
@@ -174,3 +194,47 @@ def register_callbacks(app):
                 })
 
         return explanation_block, styles
+
+
+    app.clientside_callback(
+        """
+        function(n1) {
+            const ctx = dash_clientside.callback_context;
+            if (!ctx.triggered.length) return "";
+
+            const trigger = ctx.triggered[0];
+            if (trigger.value === null) return "";
+
+            const id = ctx.triggered[0].prop_id.split('.')[0];
+            const index = JSON.parse(id).index;
+            const audioId = index + "-audio";
+            const audioEl = document.getElementById(audioId);
+            const iconEl = document.querySelector(`[id*='${index}']`);
+
+            if (!audioEl || !iconEl) return "";
+
+            // Pause all other audio and reset icons
+            document.querySelectorAll("audio").forEach(a => {
+                if (a.id !== audioId) a.pause();
+            });
+            document.querySelectorAll("img[id*='audio-icon']").forEach(img => {
+                img.src = "/assets/icons/play_icon.png";
+            });
+
+            if (audioEl.paused) {
+                audioEl.play();
+                iconEl.src = "/assets/icons/stop_icon.png";
+            } else {
+                audioEl.pause();
+                iconEl.src = "/assets/icons/play_icon.png";
+            }
+
+            return "";
+        }
+        """,
+        Output("dummy-store-audio", "data"),
+        Input({'type': 'audio-icon', 'index': ALL}, 'n_clicks'),
+        prevent_initial_call=True
+    )
+
+
