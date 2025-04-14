@@ -132,8 +132,8 @@ narrative_q1 = html.Div(
             'color': 'white',
             'lineHeight': '1.6',
             'fontSize': '16px',
-            'marginLeft': '8%',
-            'marginRight': '8%',
+            'marginLeft': '5%',
+            'marginRight': '5%',
         }
         ),
     ],)
@@ -143,7 +143,7 @@ narrative = html.Div(
     Maintenant que vous êtes devenus des connaisseurs, penchons-nous de plus près sur ces caractéristiques audio.
     Ces dimensions — comme la danceability ou encore la loudness — ont-elles évolué au fil des années et jouent-elles un rôle clair dans la popularité des morceaux ?
     """),
-    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '8%', 'marginRight': '8%',}
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '5%', 'marginRight': '5%',}
 )
 
 # Main content area that includes all sections.
@@ -151,7 +151,6 @@ content = html.Div(
     [
         # Q1 Section with an id for anchor scrolling.
         narrative_q1,
-        html.Hr(style={"border-color": "#1DB954"}),
         html.Div(
             caracteristiques_audio.layout,
             id="def-section",

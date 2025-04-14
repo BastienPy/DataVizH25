@@ -39,8 +39,8 @@ explanations = {
     },
     'mode': {
         'description': "Mode (mode) indique la tonalité du morceau. Une valeur de 0 signifie un mode mineur, tandis qu'une valeur de 1 indique un mode majeur.",
-        'high_example_name': "",
-        'low_example_name': ""
+        'high_example_name': "Closer - The Chainsmokers",
+        'low_example_name': "Scared to be Lonely - Martin Garrix"
     },
     'speechiness': {
         'description': "Speechiness (le parlé) détecte la présence de paroles parlées dans un morceau. Des valeurs proches de 1.0 suggèrent un contenu fortement parlé (comme dans un podcast ou un spoken word), tandis que des valeurs faibles indiquent principalement de la musique.",
@@ -91,7 +91,7 @@ def get_feature_block(selected_key):
             ], style={'flex': '1', 'textAlign': 'left', 'marginBottom': '5px'}),
 
             html.Div([
-                html.P(html.B(f"Forte {selected_key} :"), style={'color': '#1DB954'}),
+                html.P(html.B(f"Fort {selected_key} :"), style={'color': '#1DB954'}),
                 html.P(feature_data['high_example_name']),
                 html.Img(
                     src="/assets/icons/play_icon.png",
@@ -122,20 +122,22 @@ layout = html.Div([
                 n_clicks_timestamp=1 if feature == 'acousticness' else 0,
                 className='custom-button',
                 style={
-                    'marginRight': '10px',
-                    'padding': '6px 10px',
+                    'marginRight': '4px',
+                    'padding': '2px 5px',
                     'border': 'none',
                     'backgroundColor': '#1DB954' if feature == 'acousticness' else '#1e1e1e',
                     'color': '#1e1e1e' if feature == 'acousticness' else '#1DB954',
                     'cursor': 'pointer',
-                    'borderRadius': '5px',
+                    'borderRadius': '3px',
                     'fontWeight': 'bold',
-                    'transition': 'all 0.3s ease-in-out'
+                    'transition': 'all 0.3s ease-in-out',
+                    'whiteSpace': 'nowrap',
+                    'flexShrink': 1,
                 }
             )
             for feature in explanations
         ],
-        style={'marginBottom': '20px', 'display': 'flex', 'flexWrap': 'wrap'}
+        style={'marginBottom': '20px', 'display': 'flex', 'flexWrap': 'nowrap', 'marginLeft': '5%', 'marginRight': '5%', 'justifyContent': 'center', 'gap': '3px'}
     ),
 
     html.Div(
@@ -155,7 +157,7 @@ layout = html.Div([
     ),
 
     dcc.Store(id="dummy-store-audio")
-], style={'padding': '30px', 'backgroundColor': '#1e1e1e'})
+], style={'padding': '30px', 'backgroundColor': '#1e1e1e', 'marginLeft': '5%', 'marginRight': '5%'})
 
 def register_callbacks(app):
     @app.callback(
