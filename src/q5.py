@@ -51,6 +51,53 @@ max_year = df_popular["year_group"].dt.year.max()
 #layout
 layout = html.Div([
     html.H1("Évolution des caractéristiques musicales pour tous les genres"),
+
+    html.Div([
+        dcc.RadioItems(
+            id='genre-selector',
+            options=[{'label': 'Tous', 'value': 'all'}] + [{'label': genre.capitalize(), 'value': genre} for genre in df_popular['playlist_genre'].unique()],
+            value='all',
+            labelStyle={
+                'display': 'inline-block',
+                'margin-right': '10px',
+                'cursor': 'pointer',
+                'padding': '10px 10px',
+                'border': 'none',
+                'backgroundColor': '#1e1e1e',
+                'color': '#1DB954',
+                'borderRadius': '3px',
+                'fontWeight': 'bold',
+                'transition': 'all 0.3s ease-in-out',
+                'whiteSpace': 'nowrap'
+            },
+            inputStyle={
+                'margin-right': '5px',
+                'appearance': 'none',
+                'width': '0',
+                'height': '0'
+            }
+        )
+    ], style={'textAlign': 'center', 'marginTop': '20px'}),
+    
+
+    html.Div(id="analysis-text-container", style={  # Updated id to "analysis-text-container"
+        'color': 'white', 
+        'padding': '20px',
+        'textAlign': 'center',
+        'fontSize': '18px'
+    }),
+    html.Div(id='graphs-container'),
+    
+    html.Div(
+        html.H4("Sélectionnez l'année de référence :"),
+        style={
+            'textAlign': 'center',
+            'color': 'white',
+            'marginTop': '20px',
+            'fontSize': '16px'
+        }
+    ),
+    
     html.Div(
         dcc.Slider(
             id='base-year-slider',
@@ -62,20 +109,7 @@ layout = html.Div([
         ),
         style={'width': '60%', 'margin': '0 auto'}  
     ),
-        html.Div(
-    [
-        html.Label("Sélectionne un genre :", style={'color': 'white'}),
-        dcc.RadioItems(
-            id='genre-selector',
-            options=[{'label': 'Tous', 'value': 'all'}] + [{'label': genre.capitalize(), 'value': genre} for genre in df_popular['playlist_genre'].unique()],
-            value='all',  # Set "Tous" as the default selection
-            labelStyle={'display': 'inline-block', 'margin-right': '10px', 'color': 'white'}
-        )
-    ],
-    style={'textAlign': 'center', 'marginTop': '20px'}
-),
 
-    html.Div(id='graphs-container'),
 ])
 
 
@@ -93,12 +127,19 @@ def register_callbacks(app):
 
 
     @app.callback(
-        Output('graphs-container', 'children'),
-        Input('base-year-slider', 'value'),
-        Input('genre-selector', 'value')
+    Output('analysis-text-container', 'children'),  # Updated id to "analysis-text-container"
+    Output('graphs-container', 'children'),
+    Input('base-year-slider', 'value'),
+    Input('genre-selector', 'value')
     )
-    def update_graphs(base_year, selected_genre):
+    
+    
 
+    def update_graphs(base_year, selected_genre):
+        
+        selected_key = selected_genre if selected_genre in analyses else "tous"
+        analysis_text = analyses[selected_key]
+        
         df_popular_updated = calculate_index(df_popular, base_year=base_year)
         features = ["danceability", "energy", "speechiness", "liveness", "valence", "loudness"]
         genres_couleurs = {
@@ -139,7 +180,7 @@ def register_callbacks(app):
             for genre in df_popular_updated["playlist_genre"].unique():
                 genre_df = df_popular_updated[df_popular_updated["playlist_genre"] == genre]
                 
-                opacity = 1.0 if selected_genre == 'all' or genre == selected_genre else 0.2
+                opacity = 1.0 if selected_genre == 'all' or genre == selected_genre else 0.25
 
                 fig.add_trace(
                     go.Scatter(
@@ -148,14 +189,22 @@ def register_callbacks(app):
                         name=genre,
                         legendgroup=genre,
                         showlegend=True if i == 0 else False,
-                        hovertemplate=f"<b>Genre:</b> {genre}<br><b>Index:</b> %{{y:.2f}}<extra></extra>",
+                        hovertemplate=f"<b>{genre}</b>: %{{y:.2f}}<extra></extra>",
                         line=dict(width=2, color=genres_couleurs.get(genre, "#FFFFFF")),
                         opacity=opacity
                     ),
                     row=row,
                     col=col
                 )
-
+            
+            # Add a horizontal line at y=100
+            fig.add_hline(
+                y=100,
+                line_dash="dash",
+                line_color="gray",
+                row=row,
+                col=col
+            )
         
         
         fig.update_layout(
@@ -168,6 +217,7 @@ def register_callbacks(app):
                 title_text="Genres:",
                 font=dict(color="white") 
             ),
+            dragmode=False,  # Disable drag mode
             height=800,
             margin=dict(t=50, b=50),
             hovermode="x unified",
@@ -199,4 +249,4 @@ def register_callbacks(app):
                 col=col
             )
             
-        return html.Div([dcc.Graph(figure=fig,style={'width': '100%', 'height': '800px'})])
+        return html.Div(analysis_text), html.Div([dcc.Graph(figure=fig, style={'width': '100%', 'height': '800px'})])
