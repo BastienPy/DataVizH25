@@ -123,7 +123,7 @@ narrative = html.Div(
         dcc.Markdown(""" 
         Écouter de la musique est un plaisir universel. Mais pourquoi certains morceaux deviennent-ils des phénomènes mondiaux, tandis que d'autres passent inaperçus ?
                      
-        Pour répondre le découvrir, plongeons dans les données de Spotify avec 30 000 chansons. La plateforme de streaming attribue une note de popularité à chaque morceau, à partir de l'interaction des auditeurs et de caractéristiques audio qui définissent l'identité de chaque chanson. Regardons en détail ces caractéristiques pour mieux comprendre ce qui fait le succès d'une chanson.
+        Pour le découvrir, plongeons dans les données de Spotify avec 30 000 chansons. La plateforme de streaming attribue une note de popularité à chaque morceau, à partir de l'interaction des auditeurs et de caractéristiques audio qui définissent l'identité de chaque chanson. Regardons en détail ces caractéristiques pour mieux comprendre ce qui fait le succès d'une chanson.
         """,
         style={
             'padding': '30px',
@@ -172,6 +172,7 @@ content = html.Div(
             id="q1-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
+        html.Hr(style={"border-color": "#1DB954"}),
         narrative_q2,
         html.Hr(style={"border-color": "#1DB954"}),
         # Q2 Section with an id for anchor scrolling.
@@ -206,7 +207,16 @@ content = html.Div(
             q13.layout,
             id="q13-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
-        )
+        ),
+        html.H1(
+            "C'est la fin de cette plongée dans l'univers de Spotify. Comme vous l'avez vu, la musique est un monde complexe et fascinant. \n Comprenez-vous maintenant ce qui fait le succès d'une chanson ? Parlez-en autour de vous !",
+            style={
+                'color': 'white',
+                'textAlign': 'center',
+                'marginBottom': '30px',
+                'fontWeight': 'bold',
+            }
+        ),
     ],
     className="content"
 )
