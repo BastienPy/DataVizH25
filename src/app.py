@@ -23,9 +23,7 @@ from . import q13
 caracteristiques_audio.register_callbacks(app)
 q1.register_callbacks(app)
 q2.register_callbacks(app)
-q5.register_callbacks(app)
-q14.register_callbacks(app)
-q13.register_callbacks(app)
+
 
 # Top navigation bar with anchor links for scrolling.
 navbar = html.Div(
@@ -111,24 +109,39 @@ navbar = html.Div(
 # )
 narrative_q1 = html.Div(
     [
-        html.H1("Introduction", style={'color': '#1DB954'}),
+        html.H1(
+            "Quels ingrédients font le hit parfait… et comment ont-ils évolué avec le temps ?",
+            style={
+                'color': 'white',
+                'textAlign': 'center',
+                'marginBottom': '30px',
+                'fontWeight': 'bold',
+            }
+        ),
         dcc.Markdown(""" 
-        Écouter de la musique est un plaisir universel. Mais qu’est-ce qui fait que vous préférez une chanson à une autre ?  
-        Qu’est-ce qui fait la “popularité” que Spotify attribue aux chansons ? Plongez avec nous dans la data de l’industrie musicale  
-        pour essayer de démêler les secrets du succès musical.
-
-        **Première étape : les caractéristiques audio !**
-        """)
-    ],
-    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px'}
-)
+        Écouter de la musique est un plaisir universel. Mais pourquoi certains morceaux deviennent-ils des phénomènes mondiaux, tandis que d'autres passent inaperçus ?
+                     
+        Pour répondre le découvrir, plongeons dans les données de Spotify avec 30 000 chansons. La plateforme de streaming attribue une note de popularité à chaque morceau, à partir de l'interaction des auditeurs et de caractéristiques audio qui définissent l'identité de chaque chanson. Regardons en détail ces caractéristiques pour mieux comprendre ce qui fait le succès d'une chanson.
+        """,
+        style={
+            'padding': '30px',
+            'backgroundColor': '#121212',
+            'borderRadius': '8px',
+            'color': 'white',
+            'lineHeight': '1.6',
+            'fontSize': '16px',
+            'marginLeft': '8%',
+            'marginRight': '8%',
+        }
+        ),
+    ],)
 
 narrative = html.Div(
     dcc.Markdown("""
-    ### Story Time
-    Saviez-vous que la popularité d'une musique est influencée par ses caractéristiques audio ?
+    Maintenant que vous êtes devenus des connaisseurs, penchons-nous de plus près sur ces caractéristiques audio.
+    Ces dimensions — comme la danceability ou encore la loudness — ont-elles évolué au fil des années et jouent-elles un rôle clair dans la popularité des morceaux ?
     """),
-    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px'}
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '8%', 'marginRight': '8%',}
 )
 
 
@@ -156,33 +169,6 @@ content = html.Div(
             id="q2-section",
             style={"padding-top": "60px", "margin-top": "-60px"}
         ),
-        html.Hr(style={"border-color": "#1DB954"}),
-        # Q5 Section with an id for anchor scrolling
-        html.Div(
-            q5.layout,
-            id="q5-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
-        ),
-        html.Hr(style={"border-color": "#1DB954"}),
-        # Q11 Section with an id for anchor scrolling.
-        html.Div(
-            q11.layout,
-            id="q11-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
-        ),
-        html.Hr(style={"border-color": "#1DB954"}),
-        # Q14 Section with an id for anchor scrolling.
-        html.Div(
-            q14.layout,
-            id="q14-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
-        ),
-        html.Hr(style={"border-color": "#1DB954"}),
-        html.Div(
-            q13.layout,
-            id="q13-section",
-            style={"padding-top": "60px", "margin-top": "-60px"}
-        )
     ],
     className="content"
 )

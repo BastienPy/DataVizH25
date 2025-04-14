@@ -37,6 +37,11 @@ explanations = {
         'high_example_name': "C.U.B.A. - Calvin Harris",
         'low_example_name': "Englishman in New York - Sting"
     },
+    'mode': {
+        'description': "Mode (mode) indique la tonalité du morceau. Une valeur de 0 signifie un mode mineur, tandis qu'une valeur de 1 indique un mode majeur.",
+        'high_example_name': "",
+        'low_example_name': ""
+    },
     'speechiness': {
         'description': "Speechiness (le parlé) détecte la présence de paroles parlées dans un morceau. Des valeurs proches de 1.0 suggèrent un contenu fortement parlé (comme dans un podcast ou un spoken word), tandis que des valeurs faibles indiquent principalement de la musique.",
         'high_example_name': "Birdboy - NLE Choppa",
@@ -80,9 +85,10 @@ def get_feature_block(selected_key):
                     src=f"/assets/audio/{selected_key}_low.mp3",
                     controls=False,
                     preload="none",
+                    loop = True,
                     style={'display': 'none'}
                 )
-            ], style={'flex': '1', 'textAlign': 'left', 'marginBottom': '30px'}),
+            ], style={'flex': '1', 'textAlign': 'left', 'marginBottom': '5px'}),
 
             html.Div([
                 html.P(html.B(f"Forte {selected_key} :"), style={'color': '#1DB954'}),
@@ -97,6 +103,7 @@ def get_feature_block(selected_key):
                     src=f"/assets/audio/{selected_key}_high.mp3",
                     controls=False,
                     preload="none",
+                    loop = True,
                     style={'display': 'none'}
                 )
             ], style={'flex': '1', 'textAlign': 'left'})
