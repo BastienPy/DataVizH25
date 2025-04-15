@@ -100,7 +100,7 @@ layout = html.Div([
     html.Div([
         html.Div([
             narrative_q4
-        ], style={'width': '40%', 'display': 'inline-block', 'verticalAlign': 'top', 'marginTop': '100px'}),
+        ], style={'width': '40%', 'display': 'inline-block', 'verticalAlign': 'top', 'marginTop': '10px'}),
 
         html.Div([
             dcc.Graph(id='scatter-duration-popularity', figure=generate_duration_popularity_plot())

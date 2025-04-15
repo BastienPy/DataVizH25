@@ -64,6 +64,7 @@ def create_figure(colors):
         layout={
             'height': 500,
             'width': 700,
+            'margin': dict(t=20, b=20, l=20, r=20),
             'xaxis': {
                 'showgrid': False,
                 'zeroline': False,
@@ -71,7 +72,10 @@ def create_figure(colors):
                 'tickvals': np.arange(x_size),
                 'ticktext': x_labels,
                 'tickangle': -45,
-                'color': 'white'  # Set x-axis labels color to white
+                'tickfont': {
+                    'size': 14,  # 👈 increase font size
+                    'color': 'white'
+                }
             },
             'yaxis': {
                 'showgrid': False,
@@ -79,7 +83,10 @@ def create_figure(colors):
                 'tickmode': 'array',
                 'tickvals': np.arange(y_size),
                 'ticktext': y_labels,
-                'color': 'white'  # Set y-axis labels color to white
+                'tickfont': {
+                    'size': 14,  # 👈 increase font size
+                    'color': 'white'
+                }
             },
             'plot_bgcolor': '#121212',  # Set plot background color to black
             'paper_bgcolor': '#121212'  # Set paper background color to black
@@ -95,7 +102,7 @@ def create_figure(colors):
             hoverinfo="none",
             marker={
                 'symbol': 'square',
-                'size': 40,
+                'size': 45,
                 'color': colors[:, i],
                 'showscale': False
             },
@@ -108,44 +115,51 @@ def create_figure(colors):
 layout = html.Div([
     dcc.Store(id="color-store", data=colors.tolist()),
     dcc.Store(id="selected-column", data=None),
-
+    html.H1("Portraits sonores : comment chaque genre musical se distingue"),
+    html.Div(
+        dcc.Markdown("""
+        Une caractéristique est considérée comme importante si, au sein d’un même genre musical, elle présente une corrélation d’au moins 0,2 avec une autre caractéristique, parmi les 1000 morceaux les plus populaires d'un genre."""),
+        style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px'}
+    ),
     html.Div(  # Conteneur global
-        style={'display': 'flex', 'justifyContent': 'center', 'gap': '10px'},
+        style={'display': 'flex', 'justifyContent': 'center', 'gap': '10px', 'alignItems': 'flex-start'},
         children=[
 
             # Légende à gauche
             html.Div(
                 style={
+                    'flex': '1',
                     'display': 'flex',
                     'flexDirection': 'column',
                     'gap': '25px',
                     'color': 'white',
-                    'marginTop': '200px'
+                    'marginTop': '100px'
                 },
                 children=[
                     html.Div([
-                        html.Strong("Caractéristique", style={'marginBottom': '20px'}),
-                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                        html.Strong("Caractéristique de base", style={'marginBottom': '40px'}),
+                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'marginTop': '10px', 'marginBottom': '10px'}, children=[
                             html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#008000'}),
                             html.Span("Importante")
                         ]),
                         html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
                             html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': 'white'}),
                             html.Span("Insignifiante")
-                        ])
-                    ]),
+                        ]),
+                    ], style={'marginBottom': '30px'}),
+
                     html.Div([
-                        html.Strong("Corrélation après sélection", style={'marginBottom': '40px'}),
-                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
+                        html.Strong("Corrélation après sélection", style={'marginTop':'30px', 'marginBottom': '40px'}),
+                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'marginTop': '10px', 'marginBottom': '10px'}, children=[
                             html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#90EE90'}),
                             html.Span("Caractéristique sélectionnée")
                         ]),
-                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
-                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': 'yellow'}),
+                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'marginBottom': '10px'}, children=[
+                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#66a3ff'}),
                             html.Span("Corrélation positive")
                         ]),
-                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px'}, children=[
-                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': 'red'}),
+                        html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'marginBottom': '10px'}, children=[
+                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#ff9999'}),
                             html.Span("Corrélation négative")
                         ])
                     ])
@@ -154,22 +168,55 @@ layout = html.Div([
 
             # Colonne centrale (boutons + graphique)
             html.Div([
-                # Boutons centrés au-dessus du graphique
                 html.Div([
-                    html.Button("← Précédent", id="prev-button", n_clicks=0, className='custom-button'),
-                    html.Button("Suivant →", id="next-button", n_clicks=0, className='custom-button')
+                    html.Button("⬅", id="prev-button", n_clicks=0,
+                                style={
+                                    'backgroundColor': 'transparent',
+                                    'border': 'none',
+                                    'color': '#1DB954',
+                                    'fontWeight': 'bold',
+                                    'fontSize': '24px',
+                                    'cursor': 'pointer',
+                                    'color': '#1DB954'
+                                }),
+
+                    html.Div(id='selected-feature-display', style={
+                        'color': 'white',
+                        'fontWeight': 'bold',
+                        'fontSize': '16px',
+                        'padding': '0 20px',
+                        'display': 'flex',
+                        'alignItems': 'center',
+                        'justifyContent': 'center',
+                        'minWidth': '150px',  # Pour garder un bel espace au centre
+                        'textAlign': 'center',
+                        'width': '220px'
+                    }),
+
+                    html.Button("➡", id="next-button", n_clicks=0,
+                                style={
+                                    'backgroundColor': 'transparent',
+                                    'border': 'none',
+                                    'color': '#1DB954',
+                                    'fontWeight': 'bold',
+                                    'fontSize': '24px',
+                                    'cursor': 'pointer',
+                                    'color': '#1DB954'
+                                }),
                 ], style={
+                    'flex': '2',
                     'display': 'flex',
                     'justifyContent': 'center',
                     'gap': '20px',
                     'marginBottom': '20px'
                 }),
+                
 
                 # Graphique
                 dcc.Graph(
                     id="music-matrix",
                     figure=create_figure(colors),   
-                    config={'staticPlot': False}
+                    config={'staticPlot': True}
                 )
             ]),
 
@@ -177,10 +224,11 @@ layout = html.Div([
             html.Div(
                 id="analysis-text",
                 style={
+                    'flex': '1',
                     'width': '500px',
                     'color': 'white',
                     'fontSize': '16px',
-                    'marginTop': '200px'
+                    'marginTop': '100px'
                 },
                 children="Les genres pop, latin et R&B partagent des caractéristiques communes, tandis que les autres genres se distinguent davantage par des particularités propres."
             )
@@ -191,6 +239,7 @@ layout = html.Div([
 
 def register_callbacks(app):
     @app.callback(
+        Output("selected-feature-display", "children"),
         Output("music-matrix", "figure"),
         Output("selected-column", "data"),
         Output("analysis-text", "children"),
@@ -217,8 +266,13 @@ def register_callbacks(app):
         selected_column = all_columns[new_index]
 
         if selected_column is None:
-            return create_figure(stored_colors), None, "La pop, latin et R&B partagent des caractéristiques communes, tandis que les autres genres se distinguent davantage par des particularités propres."
-
+            return (
+                "Explorez avec les flèches",
+                create_figure(stored_colors),
+                None,
+                "La pop, latin et R&B partagent des caractéristiques communes, tandis que les autres genres se distinguent davantage par des particularités propres."
+            )
+        
         selected_characteristic = x_labels[selected_column]
         temp_colors = stored_colors.copy()
 
@@ -312,7 +366,7 @@ def register_callbacks(app):
                     if selected_idx in (feature1, feature2):
                         target_feature = feature2 if feature1 == selected_idx else feature1 
                         if temp_colors[genre, target_feature] != "white":
-                            temp_colors[genre, target_feature] = "red" if value < 0 else "yellow"
+                            temp_colors[genre, target_feature] = "#ff9999" if value < 0 else "#66a3ff"
 
         update_colors(selected_characteristic, temp_colors)
 
@@ -336,4 +390,4 @@ def register_callbacks(app):
 
         analysis = analyses.get(selected_characteristic, "")
 
-        return create_figure(temp_colors), selected_column, analysis
+        return selected_characteristic.capitalize(), create_figure(temp_colors), selected_column, analysis

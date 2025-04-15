@@ -170,6 +170,28 @@ narrative_q5 = html.Div(
     style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '5%', 'marginRight': '5%'}
 )
 
+narrative_q4 = html.Div(
+    dcc.Markdown("""
+    Au fil des années, les caractéristiques sonores ont suivi leurs propres trajectoires, façonnant des tendances nouvelles selon les genres.
+    Mais au-delà de ces dimensions musicales, un autre facteur mérite qu’on s’y attarde : la durée d’un morceau.
+    Est-elle simplement un choix artistique ou influence-t-elle réellement la popularité ?
+    Dans une époque où tout s’accélère, la longueur d’une chanson pourrait bien jouer un rôle plus stratégique qu’on ne l’imagine.
+"""),
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '5%', 'marginRight': '5%'}
+)
+
+narrative_q11 = html.Div(
+    dcc.Markdown("""
+    À l’ère des formats courts, des scrolls incessants et des tendances qui naissent et disparaissent en quelques jours, la musique semble devoir suivre ce rythme effréné.
+    La question se pose alors pour les artistes : doivent-ils vraiment s’adapter en permanence au risque de perdre leurs auditeurs ?
+                 
+    La diversité musicale deveient alors une stratégie.
+    Mais est-elle réellement un levier de popularité, ou au contraire un risque de diluer son identité dans la course au renouvellement ?
+    """),
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '5%', 'marginRight': '5%'}
+)
+
+
 # Main content area that includes all sections.
 content = html.Div(
     [
@@ -203,40 +225,49 @@ content = html.Div(
             id="q5-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
-        html.Hr(style={"border-color": "#1DB954"}),
-
+        html.Hr(style={"border-color": "#1DB954", "marginLeft": "5%", "marginRight": "5%", "marginTop": "30px"}),
+        # Q4 Section with an id for anchor scrolling
+        narrative_q4,
         html.Div(
             q4.layout,
             id="q4-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
-        html.Hr(style={"border-color": "#1DB954"}),
+        html.Hr(style={"border-color": "#1DB954", "marginLeft": "5%", "marginRight": "5%", "marginTop": "30px"}),
         # Q11 Section with an id for anchor scrolling.
+        narrative_q11,
         html.Div(
             q11.layout,
             id="q11-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
-        html.Hr(style={"border-color": "#1DB954"}),
+        html.Hr(style={"border-color": "#1DB954", "marginLeft": "5%", "marginRight": "5%", "marginTop": "30px"}),
         # Q14 Section with an id for anchor scrolling.
         html.Div(
             q14.layout,
             id="q14-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
-        html.Hr(style={"border-color": "#1DB954"}),
+        html.Hr(style={"border-color": "#1DB954", "marginLeft": "5%", "marginRight": "5%", "marginTop": "30px"}),
         html.Div(
             q13.layout,
             id="q13-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
-        html.H1(
-            "C'est la fin de cette plongée dans l'univers de Spotify. Comme vous l'avez vu, la musique est un monde complexe et fascinant. \n Comprenez-vous maintenant ce qui fait le succès d'une chanson ? Parlez-en autour de vous !",
+        html.H3(
+            """
+            C’est ici que s’achève notre exploration de l’univers musical à travers les données de Spotify.
+            Vous l’avez vu : derrière chaque morceau se cache un subtil équilibre de caractéristiques, d’émotions et de tendances.
+            Alors, avez-vous une meilleure idée de ce qui fait le succès d’une chanson ?
+            À vous maintenant d’en parler, de partager, et peut-être… d’écouter autrement.
+            """,
             style={
                 'color': 'white',
-                'textAlign': 'center',
+                'textAlign': 'left',
                 'marginBottom': '30px',
                 'fontWeight': 'bold',
+                'marginLeft': '5%',
+                'marginRight': '5%',
             }
         ),
     ],
