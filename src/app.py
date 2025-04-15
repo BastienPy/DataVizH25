@@ -14,6 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from . import caracteristiques_audio
 from . import q1
 from . import q2
+from . import q4
 from . import q5
 from . import q11
 from . import q14
@@ -23,6 +24,7 @@ from . import q13
 caracteristiques_audio.register_callbacks(app)
 q1.register_callbacks(app)
 q2.register_callbacks(app)
+q4.register_callbacks(app)
 q5.register_callbacks(app)
 q14.register_callbacks(app)
 q13.register_callbacks(app)
@@ -46,6 +48,10 @@ navbar = html.Div(
         html.A(
             [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Évolutions"],
             href="#q5-section"
+        ),
+        html.A(
+            [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Popularité vs Durée"],
+            href="#q4-section"
         ),
         html.A(
             [html.I(className="fa-brands fa-spotify", style={'marginRight': '8px'}), "Discographie"],
@@ -184,6 +190,13 @@ content = html.Div(
         html.Div(
             q5.layout,
             id="q5-section",
+            style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
+        ),
+        html.Hr(style={"border-color": "#1DB954"}),
+
+        html.Div(
+            q4.layout,
+            id="q4-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
         html.Hr(style={"border-color": "#1DB954"}),
@@ -332,6 +345,8 @@ def update_speech(current):
         return "Quelles corrélations entre les caractéristiques audio ?"
     elif current == "q5-section":
         return "Comment évoluent les caractéristiques audio selon le genre ?"
+    elif current == "q4-section":
+        return "La durée d’un morceau a-t-elle un impact sur le succès de celle-ci ?"
     elif current == "q11-section":
         return "Les artistes diversifiés sont-ils plus populaires ?"
     elif current == "q14-section":
