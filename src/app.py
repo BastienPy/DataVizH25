@@ -156,6 +156,14 @@ narrative_q2 = html.Div(
     style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '5%', 'marginRight': '5%'}
 )
 
+narrative_q5 = html.Div(
+    dcc.Markdown("""Après avoir exploré ces dimensions sonores, une question se pose : leur importance est-elle restée la même au fil du temps ?
+    Avec l’arrivée du streaming, les formats et les styles ont évolué.
+    Certaines caractéristiques se sont-elles renforcées ? D’autres ont-elles disparu ?
+    Plongeons maintenant dans leur évolution pour voir comment la musique s’est transformée, année après année, depuis les années 2000."""),
+    style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '5%', 'marginRight': '5%'}
+)
+
 # Main content area that includes all sections.
 content = html.Div(
     [
@@ -166,23 +174,24 @@ content = html.Div(
             id="def-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
+        html.Hr(style={"border-color": "#1DB954", "marginLeft": "5%", "marginRight": "5%", "marginTop": "30px"}),
         narrative_q1,
         html.Div(
             q1.layout,
             id="q1-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
-        html.Hr(style={"border-color": "#1DB954"}),
+        html.Hr(style={"border-color": "#1DB954", "marginLeft": "5%", "marginRight": "5%", "marginTop": "30px"}),
         narrative_q2,
-        html.Hr(style={"border-color": "#1DB954"}),
         # Q2 Section with an id for anchor scrolling.
         html.Div(
             q2.layout,
             id="q2-section",
             style={"padding-top": "60px", "margin-top": "-60px", 'marginLeft': '5%', 'marginRight': '5%'}
         ),
-        html.Hr(style={"border-color": "#1DB954"}),
+        html.Hr(style={"border-color": "#1DB954", "marginLeft": "5%", "marginRight": "5%", "marginTop": "30px"}),
         # Q5 Section with an id for anchor scrolling
+        narrative_q5,
         html.Div(
             q5.layout,
             id="q5-section",
