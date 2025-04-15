@@ -67,7 +67,7 @@ def get_figure():
     return fig
 
 layout = html.Div([
-    html.H1("Popularité moyenne des artistes en fonction du nombre de sous-genres"),
+    html.H1("Examinons l'impact d'une discographie variée sur la popularité"),
     html.Div([
         dcc.Graph(id="graph-q11", figure=get_figure()),
     ], style={'width': '60%', 'display': 'inline-block'}),
@@ -79,7 +79,7 @@ layout = html.Div([
             - **aux modes des époques** pour perdurer dans le temps.
             
             Une majorité des artistes ne possède qu’un seul genre, montrant possiblement la difficulté à changer de style. Ils ont également en moyenne la **popularité** la plus faible.
-            """, style={'backgroundColor': '#121212'}),
+            """, style={'backgroundColor': '#121212','fontSize': '16px',}),
             html.Br(),
             html.Br(),
             html.Br(),
@@ -87,7 +87,7 @@ layout = html.Div([
         dcc.Markdown("""
             ### Attention cependant à la lecture de ce graphique!
             Un grand nombre de sous-genre peut signifier beaucoup de tests de la part des artistes en questions, mais pas forcément que ceux-ci ont fait un album complet de chaque genre.
-        """, style={'backgroundColor': '#121212'}),
+        """, style={'backgroundColor': '#121212','fontSize': '16px',}),
     ], style={'width': '40%', 'display': 'inline-block', 'verticalAlign': 'top', "marginTop": "100px", 'color': 'white'}),
 ])
 

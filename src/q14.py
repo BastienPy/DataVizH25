@@ -276,7 +276,7 @@ def get_hover_template_custom(type_name):
 
 
 layout = html.Div([
-    html.H1("Évolution de la proportion des genres"),
+    html.H1("Analysons l'adaptaion des artistes à l'évolution des goûts musicaux"),
     html.Div([
         dcc.Graph(id="graph-q8", figure=get_figure_genre())
     ], style={'width': '50%', 'display': 'inline-block'}),
@@ -297,7 +297,7 @@ layout = html.Div([
         *Il est ainsi possible de remarquer par exemple que pour le rap, le hip-hop qui représente aujourd'hui la majeure partie du genre, n'existait pas avant les années 1990 !*
         """)
         ],
-    style={'width': '50%', 'display': 'inline-block', 'verticalAlign': 'top', "marginTop": "100px", 'color': 'white'}),
+    style={'width': '50%', 'display': 'inline-block', 'verticalAlign': 'top', "marginTop": "50px", 'color': 'white'}),
     # TODO : à compléter
     html.Div([
         html.H4("Sélectionnez votre genre et votre artiste préféré et voyez si votre idole suit le flow !", style={"textAlign": "center", "margin": "20px 0"})

@@ -53,7 +53,7 @@ def filter_df(year_range, genre):
 
 # Export the layout as a variable.
 layout = html.Div([
-    # html.H1("Évolution des caractéristiques audio et leur impact sur la popularité"),
+    html.H1("Évolution des caractéristiques audio et leur impact sur la popularité"),
     html.Label("Sélectionnez un genre :"),
     dcc.Dropdown(
         id='genre-dropdown',
@@ -63,19 +63,10 @@ layout = html.Div([
         value='all',
         
         clearable=False,
-        style={"width": "30%", "margin-bottom": "10px"},
+        style={"width": "35%", "margin-bottom": "10px"},
         className="custom-dropdown",
     ),
     html.Label("Sélectionnez l'intervalle de temps :"),
-    # dcc.RadioItems(
-    #     id="time-interval",
-    #     options=[
-    #         {"label": "Décennie", "value": "decade"},
-    #         {"label": "Année", "value": "year"}
-    #     ],
-    #     value="decade",
-    #     inline=True
-    # ),
     dcc.RangeSlider(
         id="year-slider",
         min=grouped_df["year"].min(),
@@ -168,9 +159,11 @@ def register_callbacks(app):
         elif page == 3:
             text = "Les musiques anciennes présentent un mode, valence et loudness élevés"
             year_range = [1970, 2010]
+            features = ["mode", "valence", "loudness"]
         elif page == 4:
             text = "Alors que les musique récentes présentent un mode, valence et loudness plus faibles"
             year_range = [2010, 2020]
+            features = ["mode", "valence", "loudness"]
         elif page == 5:
             text = html.Span([
                 "Ce qui indique que les musiques récentes présentent des caractéristiques audio différentes, avec une tendance vers des morceaux plus mélancoliques,",
