@@ -99,7 +99,7 @@ narrative_q13 = html.Div(
 )
 
 layout = html.Div([
-    html.H2("Évolution des caractéristiques musicales des artistes", style={"textAlign": "left"}),
+    html.H1("Évolution des caractéristiques musicales des artistes", style={"textAlign": "left"}),
     narrative_q13,
     html.Label("Sélectionnez une caractéristique musicale:"),
     dcc.Dropdown(

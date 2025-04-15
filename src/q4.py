@@ -95,7 +95,7 @@ En termes de popularité globale sur les plateformes, **le format court gagne la
 ], style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px', 'marginLeft': '5%', 'marginRight': '5%'})
 
 layout = html.Div([
-    html.H2("Durée des morceaux et popularité", style={"textAlign": "left", "color": "white"}),
+    html.H1("Durée des morceaux et popularité", style={"textAlign": "left", "color": "white"}),
 
     html.Div([
         html.Div([
