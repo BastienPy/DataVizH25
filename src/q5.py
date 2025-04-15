@@ -38,7 +38,7 @@ def calculate_index(df_popular, base_year=1998):
             base_value = base_values[base_values["playlist_genre"] == genre][feature].values[0]
             df_popular.loc[(df_popular["playlist_genre"] == genre), f"{feature}_index"] = (
                 (df_popular[feature] / base_value) * 100
-            )  # Start at 100% instead of 0%
+            ) 
     return df_popular
 
 # data
@@ -58,29 +58,29 @@ layout = html.Div([
             options=[{'label': 'Tous', 'value': 'all'}] + [{'label': genre.capitalize(), 'value': genre} for genre in df_popular['playlist_genre'].unique()],
             value='all',
             labelStyle={
-                'display': 'inline-block',
-                'margin-right': '10px',
-                'cursor': 'pointer',
-                'padding': '10px 10px',
+                'display': 'inline-block',  # Ensure buttons are displayed inline
+                'marginRight': '10px',
+                'marginLeft': '10px',
+                'padding': '6px 10px',  # Ensure consistent left and right padding
                 'border': 'none',
-                'backgroundColor': '#1e1e1e',
-                'color': '#1DB954',
-                'borderRadius': '3px',
+                'backgroundColor': '#1DB954',  # Default selected color
+                'color': '#1e1e1e',  # Default selected text color
+                'cursor': 'pointer',
+                'borderRadius': '5px',
                 'fontWeight': 'bold',
                 'transition': 'all 0.3s ease-in-out',
-                'whiteSpace': 'nowrap'
+                'whiteSpace': 'nowrap',
             },
             inputStyle={
-                'margin-right': '5px',
+      
                 'appearance': 'none',
                 'width': '0',
                 'height': '0'
             }
         )
-    ], style={'textAlign': 'center', 'marginTop': '20px'}),
-    
+    ], style={'textAlign': 'center', 'marginBottom': '20px'}),  # Center align the buttons
 
-    html.Div(id="analysis-text-container", style={  # Updated id to "analysis-text-container"
+    html.Div(id="analysis-text-container", style={  
         'color': 'white', 
         'padding': '20px',
         'textAlign': 'center',
@@ -115,19 +115,20 @@ layout = html.Div([
 
 def register_callbacks(app):
     analyses = {
-    "tous" : "Sélectionnez un genre pour voir l'analyse.",
-    "edm": "L'EDM a évolué vers une complexité émotionnelle et sonore. La baisse de la 'valence' traduit une préférence pour des ambiances plus mélancoliques, tandis que la chute de la 'speechiness' montre un éloignement des éléments vocaux au profit de l'instrumentation. L'augmentation de la 'liveness' suggère une intégration croissante d'enregistrements live, c'est le seul à avoir cette caractéristique en augmentation notable, et la baisse du 'loudness' reflète une recherche de subtilité sonore.",
-    "latin": "Le genre latin a montré une évolution marquée vers des sonorités plus dynamiques et émotionnelles. La 'danceability', en constante augmentation, reflète une adaptation aux pistes de danse et une popularité croissante. L'énergie, également en hausse, traduit une intensité accrue dans les productions, tandis que la 'speechiness', en progression, indique une place importante des éléments vocaux dans ce genre. La 'valence', bien que légèrement en baisse, conserve des tonalités majoritairement positives, et la 'loudness', en baisse puis se stabilisant par la suite, montre son adaptation aux goûts actuels.",
-    "pop": "La pop a évolué vers une production plus calibrée et émotionnellement diversifiée. La 'danceability' s’est maintenue à un niveau élevé, confirmant son orientation grand public et adaptée aux pistes de danse. L'énergie, bien qu'en légère baisse, reflète un équilibre entre intensité et accessibilité. La 'speechiness', en hausse, traduit une intégration croissante de paroles narratives ou chantées. La 'valence' en déclin révèle une transition vers des tonalités plus introspectives, tandis que la 'loudness' reste stable, témoignant d’une recherche de constance dans l’impact sonore.",
-    "r&b": "Le R&B a vu une transformation notable depuis 1998 avec des fluctuations de la 'valence', traduisant une recherche de tonalités variées. L'augmentation de l' 'energy' avec une diminution de la 'loudness' montre une évolution vers des productions plus intenses mais moins bruyantes. L’augmentation modérée de la 'speechiness' reflète l’importance continue des paroles narratives dans ce style.",
-    "rap": "Le rap a connu, depuis 1998, une stabilité de la 'speechiness', soulignant son ancrage dans le récit et les paroles dominantes. La baisse progressive de la 'valence' indique un virage vers des thèmes plus sérieux ou sombres. Malgré cela, la 'loudness' élevée combinée à une 'energy' en déclin traduit l’intensité caractéristique du genre, montrant que le rap conserve son impact sonore puissant tout en s’adaptant aux nouvelles tendances moins énergétiques.",
-    "rock": "Depuis 1998, le rock a vu sa 'valence' diminuer progressivement, reflétant un virage vers des tonalités plus sombres ou introspectives. La 'loudness' ainsi que la 'danceability' restent relativement stables mais légèrement inférieures à ses sommets passés, suggérant un adoucissement global du genre. L'augmentation de la 'speechiness' pourrait indiquer un retour à des productions avec une plus grande présence d'éléments vocaux."
+        "tous": "Sélectionnez un genre pour afficher une analyse spécifique.",
+        "edm": "L'EDM a évolué vers une esthétique sonore plus émotionnelle et nuancée. La baisse de la **valence** traduit une tendance vers des ambiances mélancoliques, tandis que la diminution de la **speechiness** suggère un recul des éléments vocaux au profit d’une instrumentation plus immersive. L’augmentation marquée de la **liveness**, unique parmi les genres, indique une intégration accrue d’enregistrements live. Enfin, la baisse de la **loudness** témoigne d’une recherche de subtilité et de finesse sonore.",
+        "latin": "Le genre latin s’oriente vers des sonorités plus dynamiques et expressives. L’augmentation constante de la **danceability** illustre son adaptation aux pistes de danse et une popularité croissante. La **energy**, également en hausse, reflète des productions plus intenses, tandis que la montée de la **speechiness** souligne l’importance du vocal dans ce style. La **valence**, bien que légèrement en déclin, conserve un caractère majoritairement positif. Quant à la **loudness**, elle montre un léger recul suivi d’une stabilisation, traduisant une évolution en phase avec les préférences contemporaines.",
+        "pop": "La pop a progressivement adopté une production plus maîtrisée, tout en gagnant en profondeur émotionnelle. La **danceability** reste élevée, confirmant sa vocation grand public. Légèrement en baisse, la **energy** reflète un équilibre recherché entre intensité et accessibilité. La hausse de la **speechiness** révèle une place croissante pour des paroles narratives ou expressives. La **valence** en recul témoigne d’une orientation vers des atmosphères plus introspectives, tandis que la **loudness**, stable, assure une continuité dans l’impact sonore.",
+        "r&b": "Le R&B a connu une transformation marquée par une exploration plus variée des émotions. Les fluctuations de la **valence** traduisent une diversité de tonalités. L’augmentation de la **energy**, combinée à une baisse de la **loudness**, montre une évolution vers des productions à la fois plus intenses et plus raffinées. La **speechiness**, en légère hausse, confirme l’importance des paroles et du storytelling dans ce genre.",
+        "rap": "Depuis 1998, le rap maintient une **speechiness** élevée, soulignant l’importance constante du texte et du récit. La baisse continue de la **valence** suggère une tendance vers des thématiques plus graves ou introspectives. Bien que la **energy** diminue, la **loudness** reste forte, traduisant un impact sonore toujours puissant, caractéristique du genre, malgré une adaptation à des sonorités plus actuelles.",
+        "rock": "Le rock montre une orientation progressive vers des ambiances plus introspectives, comme en témoigne la baisse régulière de la **valence**. La **loudness** et la **danceability**, bien que relativement stables, demeurent en deçà de leurs niveaux passés, évoquant un adoucissement du genre. L’augmentation de la **speechiness** pourrait signaler un retour à une plus grande présence vocale dans les compositions récentes."
     }
 
 
 
+
     @app.callback(
-    Output('analysis-text-container', 'children'),  # Updated id to "analysis-text-container"
+    Output('analysis-text-container', 'children'),
     Output('graphs-container', 'children'),
     Input('base-year-slider', 'value'),
     Input('genre-selector', 'value')
@@ -165,7 +166,7 @@ def register_callbacks(app):
             rows=2, 
             cols=3,
             subplot_titles=[
-                f"{feature_emojis[feature]} Évolution de l'index de {feature.capitalize()}" 
+                f"{feature_emojis[feature]} Évolution de {feature.capitalize()}" 
                 for feature in features
             ],
             vertical_spacing=0.15,
@@ -197,7 +198,7 @@ def register_callbacks(app):
                     col=col
                 )
             
-            # Add a horizontal line at y=100
+            # horizontal line
             fig.add_hline(
                 y=100,
                 line_dash="dash",
@@ -217,7 +218,7 @@ def register_callbacks(app):
                 title_text="Genres:",
                 font=dict(color="white") 
             ),
-            dragmode=False,  # Disable drag mode
+            dragmode=False,
             height=800,
             margin=dict(t=50, b=50),
             hovermode="x unified",
@@ -230,7 +231,7 @@ def register_callbacks(app):
             row = (i // 3) + 1
             col = (i % 3) + 1
             fig.update_yaxes(
-                title_text=f"Index de {feature.capitalize()}", 
+                title_text=f"{feature.capitalize()} (%)", 
                 title_font=dict(color="white"),  
                 tickfont=dict(color="white"), 
                 showgrid=False, 
@@ -249,4 +250,4 @@ def register_callbacks(app):
                 col=col
             )
             
-        return html.Div(analysis_text), html.Div([dcc.Graph(figure=fig, style={'width': '100%', 'height': '800px'})])
+        return dcc.Markdown(analysis_text), html.Div([dcc.Graph(figure=fig, style={'width': '100%', 'height': '800px'})])
