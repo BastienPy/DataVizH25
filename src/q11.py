@@ -67,7 +67,7 @@ def get_figure():
     return fig
 
 layout = html.Div([
-    html.H1("Examinons l'impact d'une discographie variée sur la popularité"),
+    html.H1("Impact d'une discographie variée sur la popularité"),
     html.Div([
         dcc.Graph(id="graph-q11", figure=get_figure()),
     ], style={'width': '60%', 'display': 'inline-block'}),

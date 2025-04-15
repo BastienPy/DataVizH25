@@ -276,7 +276,7 @@ def get_hover_template_custom(type_name):
 
 
 layout = html.Div([
-    html.H1("Analysons l'adaptation des artistes à l'évolution des goûts musicaux"),
+    html.H1("Adaptation des artistes à l'évolution des goûts musicaux"),
     html.Div([
         dcc.Graph(id="graph-q8", figure=get_figure_genre())
     ], style={'width': '50%', 'display': 'inline-block'}),

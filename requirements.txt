@@ -56,10 +56,11 @@ networkx==2.4
 notebook==6.0.3
 numpy==1.18.1
 opencv-python==4.2.0.32
-packaging==20.4
+packaging==24.2
 pandas==1.0.5
 pandocfilters==1.4.2
 parso==0.7.0
+patsy==1.0.1
 pickleshare==0.7.5
 Pillow==7.0.0
 plotly==6.0.1
@@ -83,6 +84,7 @@ scikit-image==0.16.2
 scipy==1.4.1
 Send2Trash==1.5.0
 six==1.14.0
+statsmodels==0.14.1
 terminado==0.8.3
 testpath==0.4.4
 tornado==6.0.4
