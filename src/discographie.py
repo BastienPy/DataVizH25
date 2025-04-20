@@ -9,7 +9,7 @@ def convert_date(date):
         return pd.to_datetime(date, format="%Y-%m-%d")
     except ValueError:
         try:
-            # Format année seule "%Y", compléter par "-01-01"
+            # Format année seule "%Y", complété par "-01-01"
             return pd.to_datetime(date, format="%Y") + pd.offsets.DateOffset(months=0, days=0)
         except ValueError:
             return pd.NaT

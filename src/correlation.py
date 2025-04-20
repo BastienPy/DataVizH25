@@ -22,24 +22,17 @@ def get_dataframe(path):
     """Load and preprocess the Spotify dataset."""
     data = pd.read_csv(path)
     data["track_album_release_date"] = pd.to_datetime(data["track_album_release_date"])
-    # data = data.groupby("playlist_genre").apply(lambda x: x.nlargest("track_popularity")).reset_index(drop=True)
-    # excluded_artists = [
-    #     "The Sleep Specialist", "Nature Sounds", "Natural Sound Makers", "Mother Nature Sound FX",
-    #     "Rain Recordings", "Pinetree Way", "Aquagirl", "Rain Sounds FX", "Relax Meditate Sleep",
-    #     "Life Sounds Nature"
-    # ]
-    # data = data[~data["track_artist"].isin(excluded_artists)]
     data = data[data["track_album_release_date"].dt.year >= 1970]
     return data
 
 # Load data
 data = get_dataframe("dataset/spotify_songs_clean.csv")
 
-# Define matrix size
+# Taille de la matrice
 x_size = 10
 y_size = 6
 
-# Labels for axes (Inverted Y-axis)
+# Labels des axes (inversion de l'axe des ordonnées)
 y_labels = ["Pop", "Latin", "R&B", "Rap", "EDM", "Rock"][::-1]
 x_labels = ["loudness", "energy", "acousticness", "valence", "danceability", 
             "tempo", "instrumentalness", "duration_ms", "speechiness", "liveness"]

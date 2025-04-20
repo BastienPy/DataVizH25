@@ -7,7 +7,7 @@ from dash import ctx, no_update
 
 
 
-# dataset et carac audio
+# dataset et caractéristiques audio
 dataset_path = "./dataset/spotify_songs_clean.csv"
 carac_audio = [
     "danceability", "energy", "key", "loudness", "mode", 
@@ -17,31 +17,22 @@ carac_audio = [
 def preprocess_data():
     df = pd.read_csv(dataset_path)
     
-    
-    # release date -> datetime et extract year
+    # Release date -> datetime et extract year
     df["track_album_release_date"] = pd.to_datetime(df["track_album_release_date"], errors="coerce")
     df["year"] = df["track_album_release_date"].dt.year
-    # print(df)
     
-    
-    # garder les données après 1970
+    # Garder les données après 1970
     df = df[df["year"] >= 1970]
-    # print(df)
     
-    # moyenne de popularite par an pour chaque carcteristique audio
+    # Moyenne de popularite par an pour chaque caracteristique audio
     grouped_df = df.groupby("year")[["track_popularity"] + carac_audio].mean().reset_index()
     
-    #for each genre
+    # On groupe par genre et par année
     grouped_df_genre = df.groupby(["year", "playlist_genre"])[["track_popularity"] + carac_audio].mean().reset_index()
 
-    # print("grouped df")
-    # print(grouped_df)
-    # print("grouped df for genre")
-    # print(grouped_df_genre )
     return grouped_df,grouped_df_genre
 
 grouped_df,grouped_df_genre = preprocess_data()
-# print(df)
 
 def filter_df(year_range, genre):
     start_year, end_year = year_range
@@ -51,7 +42,6 @@ def filter_df(year_range, genre):
         filtered = grouped_df_genre[(grouped_df_genre["playlist_genre"] == genre)]
         return filtered[(filtered["year"] >= start_year) & (filtered["year"] <= end_year)]
 
-# Export the layout as a variable.
 layout = html.Div([
     html.H1("Évolution des caractéristiques audio et leur impact sur la popularité"),
     html.Label("Sélectionnez un genre :"),
@@ -88,11 +78,10 @@ layout = html.Div([
                     'marginTop': '20px',
                     'marginBottom': '20px'
                 }),
-            #analyse et texte
+            # Analyse et texte
             html.Div(
                 id="analysis-text-q1",
                 style={
-                    # 'width': '900px',
                     'color': 'white',
                     'fontSize': '16px',
                     'marginTop': '20px',

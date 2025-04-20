@@ -18,7 +18,7 @@ def convert_date(date):
 def get_dataframe(path):
     data = pd.read_csv(path)
     data["track_album_release_date"] = data["track_album_release_date"].apply(convert_date)
-    #Keep only songs released from 1970 onward
+    # Conserver uniquement des dates supérieures à 1970
     data = data[data["track_album_release_date"].dt.year >= 1970]
     return data
 
@@ -63,7 +63,7 @@ def data_preprocess(path, filter_type, artist=None):
     """
     data = get_dataframe(path)
     data["year"] = data["track_album_release_date"].dt.year
-    data["decennie"] = (data["year"] // 10) * 10  #Calculate the decade
+    data["decennie"] = (data["year"] // 10) * 10  # Calcul de la décénnie
 
     if filter_type == "artist":
         data = data[data["track_artist"] == artist]
@@ -117,7 +117,7 @@ def data_preprocess_artist_cumulative(path, artist, genre_filter):
     
     return cum_percent
 
-#Custom binning preprocessing function with 10 bins over a dynamic time range
+
 def data_preprocess_custom(path,genre_filter, bins=10, start_date=None, end_date=None):
     """
     Preprocess des données avec des dates personnalisées et des bins
@@ -146,23 +146,23 @@ def data_preprocess_custom(path,genre_filter, bins=10, start_date=None, end_date
     
     data = data[data["playlist_genre"] == genre_filter]
     
-    #Dates de début et de fin
+    # Dates de début et de fin
     min_date = start_date or data["track_album_release_date"].min()
     max_date = end_date or data["track_album_release_date"].max()
 
-    #S'il n'y a qu'une date, on rajoute un jour
+    # S'il n'y a qu'une date, on rajoute un jour
     if min_date == max_date:
         max_date = min_date + pd.Timedelta(days=1)
         
-    #Création des bins
+    # Création des bins
     bin_edges = pd.date_range(start=min_date, end=max_date, periods=bins+1)
     bin_midpoints = [bin_edges[i] + (bin_edges[i+1] - bin_edges[i]) / 2 for i in range(len(bin_edges)-1)]
     
-    #Filtrage des données et assignation des chansons aux bins
+    # Filtrage des données et assignation des chansons aux bins
     data = data[(data["track_album_release_date"] >= min_date) & (data["track_album_release_date"] <= max_date)]
     data["time_bin"] = pd.cut(data["track_album_release_date"], bins=bin_edges, labels=bin_midpoints, include_lowest=True)
     
-    #Calcul des pourcentages
+    # Calcul des pourcentages
     genre_data = data.groupby(["time_bin", "playlist_subgenre"]).size().reset_index(name="count")
     genre_data = genre_data.pivot(index="time_bin", columns="playlist_subgenre", values="count").fillna(0)
     genre_data = (genre_data.div(genre_data.sum(axis=1), axis=0) * 100).reset_index()
@@ -198,7 +198,7 @@ def get_figure_genre():
     return fig
 
 
-#Figures en cache pour les sous-genres
+# Figures en cache pour les sous-genres
 subgenre_cache = {
     "edm": px.area(
         data_preprocess("./dataset/spotify_songs_clean.csv", "edm"),
@@ -262,7 +262,7 @@ def get_hover_template(type_name):
     )
 
 
-#Hover template pour les graphes avec les custom bins
+# Hover template pour les graphes avec les custom bins
 def get_hover_template_custom(type_name):
     return (
         f"<b>{type_name}:</b></span>" 
@@ -298,7 +298,6 @@ layout = html.Div([
         """)
         ],
     style={'width': '50%', 'display': 'inline-block', 'verticalAlign': 'top', "marginTop": "50px", 'color': 'white'}),
-    # TODO : à compléter
     html.Div([
         html.H4("Sélectionnez votre genre et votre artiste préféré et voyez si votre idole suit le flow !", style={"textAlign": "center", "margin": "20px 0"})
     ]),

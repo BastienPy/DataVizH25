@@ -1,5 +1,3 @@
-# src/q4.py
-
 from dash import html, dcc
 import pandas as pd
 import numpy as np
@@ -107,6 +105,3 @@ layout = html.Div([
         ], style={'width': '60%', 'display': 'inline-block'})
     ])
 ])
-
-def register_callbacks(app):
-    pass

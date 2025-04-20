@@ -11,10 +11,10 @@ def load_and_clean_data(filepath="./dataset/spotify_songs_clean.csv"):
     return df
 
 def preprocess_dates(df):
-    df["track_album_release_date"] = pd.to_datetime(df["track_album_release_date"], errors='coerce') #conversion en datetime
+    df["track_album_release_date"] = pd.to_datetime(df["track_album_release_date"], errors='coerce') # conversion en datetime
     df = df[df["track_album_release_date"].notna() & (df["track_album_release_date"].dt.month.notna())] 
     df["year_month"] = df["track_album_release_date"].dt.to_period('M')
-    df = df[df["year_month"] > '2000-01'] #filtre pour ne garder que les dates après 2000
+    df = df[df["year_month"] > '2000-01'] # filtre pour ne garder que les dates après 2000
     df["year_month"] = df["year_month"].astype(str)
     return df
 
