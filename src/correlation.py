@@ -49,9 +49,10 @@ arr = np.array([[1,1,1,1,1,1,0,0,0,0],
                 [1,1,1,1,1,1,0,1,1,0]])[::-1].copy()
 
 # Convert matrix values to colors
-colors = np.vectorize(color_map.get)(arr)
+borders_colors = np.vectorize(color_map.get)(arr)
+colors_inside = np.vectorize(color_map.get)(arr)
 
-def create_figure(colors):
+def create_figure(borders_colors):
     """Creates a new figure based on the color matrix."""
     fig = go.Figure(
         layout={
@@ -94,10 +95,14 @@ def create_figure(colors):
             mode='markers',
             hoverinfo="none",
             marker={
-                'symbol': 'square',
-                'size': 45,
-                'color': colors[:, i],
-                'showscale': False
+            'symbol': 'square',
+            'size': 45,
+            'color': colors_inside[:, i],
+            'showscale': False,
+            'line': {
+                'color': borders_colors[:, i],  # Couleur de la bordure
+                'width': 4  # Largeru de la bordure
+            }
             },
             showlegend=False
         )
@@ -106,12 +111,12 @@ def create_figure(colors):
 
 # Dash layout
 layout = html.Div([
-    dcc.Store(id="color-store", data=colors.tolist()),
+    dcc.Store(id="color-store", data=borders_colors.tolist()),
     dcc.Store(id="selected-column", data=None),
     html.H1("Portraits sonores : comment chaque genre musical se distingue"),
     html.Div(
         dcc.Markdown("""
-        Une caractéristique est considérée comme importante si, au sein d’un même genre musical, elle présente une corrélation d’au moins 0,2 avec une autre caractéristique, parmi les 1000 morceaux les plus populaires d'un genre."""),
+        Une caractéristique est considérée comme importante si, au sein d’un même genre musical, elle présente une **corrélation d’au moins 0,2 en valeur absolue** avec une autre caractéristique, parmi les 1000 morceaux les plus populaires d'un genre."""),
         style={'padding': '20px', 'backgroundColor': '#121212', 'borderRadius': '8px'}
     ),
     html.Div(  # Conteneur global
@@ -130,7 +135,7 @@ layout = html.Div([
                 },
                 children=[
                     html.Div([
-                        html.Strong("Caractéristique de base", style={'marginBottom': '40px'}),
+                        html.Strong("Corrélation entre les données", style={'marginBottom': '40px'}),
                         html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'marginTop': '10px', 'marginBottom': '10px'}, children=[
                             html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#008000'}),
                             html.Span("Importante")
@@ -142,7 +147,7 @@ layout = html.Div([
                     ], style={'marginBottom': '30px'}),
 
                     html.Div([
-                        html.Strong("Corrélation après sélection", style={'marginTop':'30px', 'marginBottom': '40px'}),
+                        html.Strong("Informations supplémentaires (après sélection d'une caractéristique)", style={'marginTop':'30px', 'marginBottom': '40px'}),
                         html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'marginTop': '10px', 'marginBottom': '10px'}, children=[
                             html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#90EE90'}),
                             html.Span("Caractéristique sélectionnée")
@@ -208,7 +213,7 @@ layout = html.Div([
                 # Graphique
                 dcc.Graph(
                     id="music-matrix",
-                    figure=create_figure(colors),   
+                    figure=create_figure(borders_colors),   
                     config={'staticPlot': True}
                 )
             ]),
@@ -359,7 +364,7 @@ def register_callbacks(app):
                     if selected_idx in (feature1, feature2):
                         target_feature = feature2 if feature1 == selected_idx else feature1 
                         if temp_colors[genre, target_feature] != "white":
-                            temp_colors[genre, target_feature] = "#ff9999" if value < 0 else "#66a3ff"
+                            temp_colors[genre, target_feature] = "#66a3ff" if value > 0 else "#ff9999"
 
         update_colors(selected_characteristic, temp_colors)
 
