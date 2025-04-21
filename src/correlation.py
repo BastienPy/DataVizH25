@@ -101,7 +101,7 @@ def create_figure(borders_colors):
             'showscale': False,
             'line': {
                 'color': borders_colors[:, i],  # Couleur de la bordure
-                'width': 4  # Largeru de la bordure
+                'width': 4  # Largeur de la bordure
             }
             },
             showlegend=False
@@ -135,7 +135,7 @@ layout = html.Div([
                 },
                 children=[
                     html.Div([
-                        html.Strong("Corrélation entre les données", style={'marginBottom': '40px'}),
+                        html.Strong("Importance de la caractéristique pour le genre", style={'marginBottom': '40px'}),
                         html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'marginTop': '10px', 'marginBottom': '10px'}, children=[
                             html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#008000'}),
                             html.Span("Importante")
@@ -147,18 +147,18 @@ layout = html.Div([
                     ], style={'marginBottom': '30px'}),
 
                     html.Div([
-                        html.Strong("Informations supplémentaires (après sélection d'une caractéristique)", style={'marginTop':'30px', 'marginBottom': '40px'}),
+                        html.Strong("Corrélations entre les caractéristiques", style={'marginTop':'30px', 'marginBottom': '40px'}),
                         html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'marginTop': '10px', 'marginBottom': '10px'}, children=[
-                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#90EE90'}),
+                            html.Div(style={'width': '15px', 'height': '15px', 'border':'3px solid #90EE90','boxSizing': 'border-box'}),
                             html.Span("Caractéristique sélectionnée")
                         ]),
                         html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'marginBottom': '10px'}, children=[
-                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#66a3ff'}),
-                            html.Span("Corrélation positive")
+                            html.Div(style={'width': '15px', 'height': '15px', 'border': '3px solid #66a3ff','boxSizing': 'border-box'}),
+                            html.Span("Forte corrélation positive (> 0.2)")
                         ]),
                         html.Div(style={'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'marginBottom': '10px'}, children=[
-                            html.Div(style={'width': '15px', 'height': '15px', 'backgroundColor': '#ff9999'}),
-                            html.Span("Corrélation négative")
+                            html.Div(style={'width': '15px', 'height': '15px', 'border': '3px solid #ff9999','boxSizing': 'border-box'}),
+                            html.Span("Forte corrélation négative (< -0.2)")
                         ])
                     ])
                 ]
@@ -365,7 +365,6 @@ def register_callbacks(app):
                         target_feature = feature2 if feature1 == selected_idx else feature1 
                         if temp_colors[genre, target_feature] != "white":
                             temp_colors[genre, target_feature] = "#66a3ff" if value > 0 else "#ff9999"
-
         update_colors(selected_characteristic, temp_colors)
 
         for y in range(y_size):
